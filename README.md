@@ -28,3 +28,70 @@ This simple sample shows how to use render template directives in the alexa
 skill built using ASK Python SDK.
 
 [![Get Started](https://m.media-amazon.com/images/G/01/mobile-apps/dex/alexa/alexa-skills-kit/tutorials/general/buttons/button_get_started._TTH_.png)](./instructions/setup-vui-alexa-hosted.md)
+
+## Developer Setup
+
+This project uses modern Python tooling with [uv](https://docs.astral.sh/uv/) for fast dependency management.
+
+### Prerequisites
+
+- Python 3.14+
+- [uv](https://docs.astral.sh/uv/) package manager
+
+### Installation
+
+```bash
+# Install uv (if not already installed)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Navigate to lambda directory
+cd lambda
+
+# Install dependencies (creates venv automatically)
+uv sync
+```
+
+### Development Commands
+
+```bash
+# Run tests
+uv run pytest
+
+# Run tests with coverage
+uv run pytest --cov
+
+# Lint code
+uv run ruff check .
+
+# Format code
+uv run ruff format .
+
+# Type check
+uv run mypy .
+
+# Run the skill locally (if applicable)
+uv run python lambda_function.py
+```
+
+### Project Structure
+
+- `lambda/` - Lambda function code
+  - `lambda_function.py` - Main skill handler
+  - `alexa/` - Helper modules (data, utilities)
+  - `pyproject.toml` - Project dependencies and tool configuration
+  - `.python-version` - Python version pin (3.14)
+
+### Dependencies
+
+- **Runtime**: `ask-sdk-core` (Alexa Skills Kit SDK)
+- **Dev**: `pytest`, `pytest-cov`, `ruff`, `mypy`
+
+### Adding Dependencies
+
+```bash
+# Add runtime dependency
+uv add package-name
+
+# Add dev dependency
+uv add --dev package-name
+```
