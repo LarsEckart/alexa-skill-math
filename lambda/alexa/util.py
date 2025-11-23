@@ -1,10 +1,9 @@
-# -*- coding: utf-8 -*-
 
 """Utility module to generate text for commonly used responses."""
 
 import random
+
 import six
-from ask_sdk_core.handler_input import HandlerInput
 from ask_sdk_core.utils import is_request_type
 
 from . import data
@@ -17,8 +16,7 @@ def get_random_state(states_list):
 
 def state_properties():
     """Return the list of state properties."""
-    val = ["abbreviation", "capital", "statehood_year",
-           "statehood_order"]
+    val = ["abbreviation", "capital", "statehood_year", "statehood_order"]
     return val
 
 
@@ -29,11 +27,11 @@ def get_random_state_property():
 
 def get_card_description(item):
     """Return the description shown on card in Alexa response."""
-    text = "State Name: {}\n".format(item['state'])
-    text += "State Capital: {}\n".format(item['capital'])
-    text += "Statehood Year: {}\n".format(item['statehood_year'])
-    text += "Statehood Order: {}\n".format(item['statehood_order'])
-    text += "Abbreviation: {}\n".format(item['abbreviation'])
+    text = "State Name: {}\n".format(item["state"])
+    text += "State Capital: {}\n".format(item["capital"])
+    text += "Statehood Year: {}\n".format(item["statehood_year"])
+    text += "Statehood Order: {}\n".format(item["statehood_order"])
+    text += "Abbreviation: {}\n".format(item["abbreviation"])
     return text
 
 
@@ -42,18 +40,19 @@ def supports_display(handler_input):
     """Check if display is supported by the skill."""
     try:
         if hasattr(
-                handler_input.request_envelope.context.system.device.
-                        supported_interfaces, 'display'):
+            handler_input.request_envelope.context.system.device.supported_interfaces, "display"
+        ):
             return (
-                    handler_input.request_envelope.context.system.device.
-                    supported_interfaces.display is not None)
-    except:
+                handler_input.request_envelope.context.system.device.supported_interfaces.display
+                is not None
+            )
+    except Exception:
         return False
 
 
 def get_bad_answer(item):
     """Return response text for incorrect answer."""
-    return "{} {}".format(data.BAD_ANSWER.format(item), data.HELP_MESSAGE)
+    return f"{data.BAD_ANSWER.format(item)} {data.HELP_MESSAGE}"
 
 
 def get_current_score(score, counter):
@@ -78,20 +77,26 @@ def get_image(ht, wd, label):
 
 def get_small_image(item):
     """Get state flag small image (720x400)."""
-    return get_image(720, 400, item['abbreviation'])
+    return get_image(720, 400, item["abbreviation"])
 
 
 def get_large_image(item):
     """Get state flag large image (1200x800)."""
-    return get_image(1200, 800, item['abbreviation'])
+    return get_image(1200, 800, item["abbreviation"])
 
 
 def get_speech_description(item):
     """Return state information in well formatted text."""
     return data.SPEECH_DESC.format(
-        item['state'], item['statehood_order'], item['statehood_year'],
-        item['state'], item['capital'], item['state'], item['abbreviation'],
-        item['state'])
+        item["state"],
+        item["statehood_order"],
+        item["statehood_year"],
+        item["state"],
+        item["capital"],
+        item["state"],
+        item["abbreviation"],
+        item["state"],
+    )
 
 
 def get_ordinal_indicator(counter):
@@ -103,7 +108,7 @@ def get_ordinal_indicator(counter):
     elif counter == 3:
         return "3rd"
     else:
-        return "{}th".format(str(counter))
+        return f"{str(counter)}th"
 
 
 def __get_attr_for_speech(attr):
@@ -112,27 +117,24 @@ def __get_attr_for_speech(attr):
 
 
 def get_question_without_ordinal(attr, item):
-    return "What is the {} of {}. ".format(
-        __get_attr_for_speech(attr), item["state"])
+    return "What is the {} of {}. ".format(__get_attr_for_speech(attr), item["state"])
 
 
 def get_question(counter, attr, item):
     """Return response text for nth question to the user."""
-    return (
-        "Here is your {} question. {}").format(
-        get_ordinal_indicator(counter),
-        get_question_without_ordinal(attr, item))
+    return (f"Here is your {get_ordinal_indicator(counter)} question. {get_question_without_ordinal(attr, item)}")
 
 
 def get_answer(attr, item):
     """Return response text for correct answer to the user."""
     if attr.lower() == "abbreviation":
-        return ("The {} of {} is "
-                "<say-as interpret-as='spell-out'>{}</say-as>. ").format(
-            __get_attr_for_speech(attr), item["state"], item["abbreviation"])
+        return ("The {} of {} is <say-as interpret-as='spell-out'>{}</say-as>. ").format(
+            __get_attr_for_speech(attr), item["state"], item["abbreviation"]
+        )
     else:
         return "The {} of {} is {}. ".format(
-            __get_attr_for_speech(attr), item["state"], item[attr.lower()])
+            __get_attr_for_speech(attr), item["state"], item[attr.lower()]
+        )
 
 
 def ask_question(handler_input):
@@ -154,8 +156,7 @@ def ask_question(handler_input):
 
 def get_speechcon(correct_answer):
     """Return speechcon corresponding to the boolean answer correctness."""
-    text = ("<say-as interpret-as='interjection'>{} !"
-            "</say-as><break strength='strong'/>")
+    text = "<say-as interpret-as='interjection'>{} !</say-as><break strength='strong'/>"
     if correct_answer:
         return text.format(random.choice(data.CORRECT_SPEECHCONS))
     else:
@@ -170,7 +171,7 @@ def get_multiple_choice_answers(item, attr, states_list):
     while len(answers_list) < 3:
         state = random.choice(states_list)
 
-        if not state[attr] in answers_list:
+        if state[attr] not in answers_list:
             answers_list.append(state[attr])
 
     random.shuffle(answers_list)
@@ -196,12 +197,11 @@ def get_item(slots, states_list):
 
 def compare_token_or_slots(handler_input, value):
     """Compare value with slots or token,
-        for display selected event or voice response for quiz answer."""
+    for display selected event or voice response for quiz answer."""
     if is_request_type("Display.ElementSelected")(handler_input):
         return handler_input.request_envelope.request.token == value
     else:
-        return compare_slots(
-            handler_input.request_envelope.request.intent.slots, value)
+        return compare_slots(handler_input.request_envelope.request.intent.slots, value)
 
 
 def compare_slots(slots, value):
@@ -211,4 +211,3 @@ def compare_slots(slots, value):
             return slot.value.lower() == value.lower()
     else:
         return False
-

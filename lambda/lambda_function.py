@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 # IMPORTANT: Please note that this template uses Display Directives,
 # Display Interface for your skill should be enabled through the Amazon
@@ -8,23 +7,29 @@
 import json
 import logging
 
-from ask_sdk_core.skill_builder import SkillBuilder
-from ask_sdk_core.handler_input import HandlerInput
-from ask_sdk_core.serialize import DefaultSerializer
 from ask_sdk_core.dispatch_components import (
-    AbstractRequestHandler, AbstractExceptionHandler,
-    AbstractResponseInterceptor, AbstractRequestInterceptor)
+    AbstractExceptionHandler,
+    AbstractRequestHandler,
+    AbstractRequestInterceptor,
+    AbstractResponseInterceptor,
+)
+from ask_sdk_core.response_helper import get_plain_text_content, get_rich_text_content
+from ask_sdk_core.serialize import DefaultSerializer
+from ask_sdk_core.skill_builder import SkillBuilder
 from ask_sdk_core.utils import is_intent_name, is_request_type
-from ask_sdk_core.response_helper import (
-    get_plain_text_content, get_rich_text_content)
-
+from ask_sdk_model import Response, ui
 from ask_sdk_model.interfaces.display import (
-    ImageInstance, Image, RenderTemplateDirective, ListTemplate1,
-    BackButtonBehavior, ListItem, BodyTemplate2, BodyTemplate1)
-from ask_sdk_model import ui, Response
+    BackButtonBehavior,
+    BodyTemplate1,
+    BodyTemplate2,
+    Image,
+    ImageInstance,
+    ListItem,
+    ListTemplate1,
+    RenderTemplateDirective,
+)
 
 from alexa import data, util
-
 
 # Skill Builder object
 sb = SkillBuilder()
@@ -36,6 +41,7 @@ logger.setLevel(logging.INFO)
 # Request Handler classes
 class LaunchRequestHandler(AbstractRequestHandler):
     """Handler for skill launch."""
+
     def can_handle(self, handler_input):
         # type: (HandlerInput) -> bool
         return is_request_type("LaunchRequest")(handler_input)
@@ -43,13 +49,13 @@ class LaunchRequestHandler(AbstractRequestHandler):
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
         logger.info("In LaunchRequestHandler")
-        handler_input.response_builder.speak(data.WELCOME_MESSAGE).ask(
-            data.HELP_MESSAGE)
+        handler_input.response_builder.speak(data.WELCOME_MESSAGE).ask(data.HELP_MESSAGE)
         return handler_input.response_builder.response
 
 
 class SessionEndedRequestHandler(AbstractRequestHandler):
     """Handler for skill session end."""
+
     def can_handle(self, handler_input):
         # type: (HandlerInput) -> bool
         return is_request_type("SessionEndedRequest")(handler_input)
@@ -57,13 +63,13 @@ class SessionEndedRequestHandler(AbstractRequestHandler):
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
         logger.info("In SessionEndedRequestHandler")
-        print("Session ended with reason: {}".format(
-            handler_input.request_envelope))
+        print(f"Session ended with reason: {handler_input.request_envelope}")
         return handler_input.response_builder.response
 
 
 class HelpIntentHandler(AbstractRequestHandler):
     """Handler for help intent."""
+
     def can_handle(self, handler_input):
         # type: (HandlerInput) -> bool
         return is_intent_name("AMAZON.HelpIntent")(handler_input)
@@ -74,24 +80,25 @@ class HelpIntentHandler(AbstractRequestHandler):
         handler_input.attributes_manager.session_attributes = {}
         # Resetting session
 
-        handler_input.response_builder.speak(
-            data.HELP_MESSAGE).ask(data.HELP_MESSAGE)
+        handler_input.response_builder.speak(data.HELP_MESSAGE).ask(data.HELP_MESSAGE)
         return handler_input.response_builder.response
 
 
 class ExitIntentHandler(AbstractRequestHandler):
     """Single Handler for Cancel, Stop and Pause intents."""
+
     def can_handle(self, handler_input):
         # type: (HandlerInput) -> bool
-        return (is_intent_name("AMAZON.CancelIntent")(handler_input) or
-                is_intent_name("AMAZON.StopIntent")(handler_input) or
-                is_intent_name("AMAZON.PauseIntent")(handler_input))
+        return (
+            is_intent_name("AMAZON.CancelIntent")(handler_input)
+            or is_intent_name("AMAZON.StopIntent")(handler_input)
+            or is_intent_name("AMAZON.PauseIntent")(handler_input)
+        )
 
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
         logger.info("In ExitIntentHandler")
-        handler_input.response_builder.speak(
-            data.EXIT_SKILL_MESSAGE).set_should_end_session(True)
+        handler_input.response_builder.speak(data.EXIT_SKILL_MESSAGE).set_should_end_session(True)
         return handler_input.response_builder.response
 
 
@@ -104,10 +111,12 @@ class QuizHandler(AbstractRequestHandler):
     the card and shown in the Response. If the skill uses display,
     then the question is displayed using RenderTemplates.
     """
+
     def can_handle(self, handler_input):
         # type: (HandlerInput) -> bool
-        return (is_intent_name("QuizIntent")(handler_input) or
-                is_intent_name("AMAZON.StartOverIntent")(handler_input))
+        return is_intent_name("QuizIntent")(handler_input) or is_intent_name(
+            "AMAZON.StartOverIntent"
+        )(handler_input)
 
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
@@ -130,23 +139,25 @@ class QuizHandler(AbstractRequestHandler):
                     text=data.START_QUIZ_MESSAGE + question,
                     image=ui.Image(
                         small_image_url=util.get_small_image(item),
-                        large_image_url=util.get_large_image(item)
-                    )))
+                        large_image_url=util.get_large_image(item),
+                    ),
+                )
+            )
 
         if util.supports_display(handler_input):
             item = attr["quiz_item"]
             item_attr = attr["quiz_attr"]
             title = "Question #{}".format(str(attr["counter"]))
             background_img = Image(
-                sources=[ImageInstance(
-                    url=util.get_image(
-                        ht=1024, wd=600, label=item["abbreviation"]))])
+                sources=[
+                    ImageInstance(url=util.get_image(ht=1024, wd=600, label=item["abbreviation"]))
+                ]
+            )
             item_list = []
-            for ans in util.get_multiple_choice_answers(
-                    item, item_attr, data.STATES_LIST):
-                item_list.append(ListItem(
-                    token=ans,
-                    text_content=get_plain_text_content(primary_text=ans)))
+            for ans in util.get_multiple_choice_answers(item, item_attr, data.STATES_LIST):
+                item_list.append(
+                    ListItem(token=ans, text_content=get_plain_text_content(primary_text=ans))
+                )
 
             response_builder.add_directive(
                 RenderTemplateDirective(
@@ -155,7 +166,10 @@ class QuizHandler(AbstractRequestHandler):
                         back_button=BackButtonBehavior.HIDDEN,
                         background_image=background_img,
                         title=title,
-                        list_items=item_list)))
+                        list_items=item_list,
+                    )
+                )
+            )
 
         return response_builder.response
 
@@ -169,19 +183,19 @@ class DefinitionHandler(AbstractRequestHandler):
     is added to the Card or the RenderTemplate after checking if that
     is supported.
     """
+
     def can_handle(self, handler_input):
         # type: (HandlerInput) -> bool
         attr = handler_input.attributes_manager.session_attributes
-        return (is_intent_name("AnswerIntent")(handler_input) and
-                attr.get("state") != "QUIZ")
+        return is_intent_name("AnswerIntent")(handler_input) and attr.get("state") != "QUIZ"
 
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
         logger.info("In DefinitionHandler")
         response_builder = handler_input.response_builder
         item, is_resolved = util.get_item(
-            slots=handler_input.request_envelope.request.intent.slots,
-            states_list=data.STATES_LIST)
+            slots=handler_input.request_envelope.request.intent.slots, states_list=data.STATES_LIST
+        )
 
         if is_resolved:
             if data.USE_CARDS_FLAG:
@@ -191,29 +205,31 @@ class DefinitionHandler(AbstractRequestHandler):
                         text=util.get_card_description(item),
                         image=ui.Image(
                             small_image_url=util.get_small_image(item),
-                            large_image_url=util.get_large_image(item)
-                        )))
+                            large_image_url=util.get_large_image(item),
+                        ),
+                    )
+                )
 
             if util.supports_display(handler_input):
-                img = Image(
-                    sources=[ImageInstance(url=util.get_large_image(item))])
+                img = Image(sources=[ImageInstance(url=util.get_large_image(item))])
                 title = util.get_card_title(item)
-                primary_text = get_plain_text_content(
-                    primary_text=util.get_card_description(item))
+                primary_text = get_plain_text_content(primary_text=util.get_card_description(item))
 
                 response_builder.add_directive(
                     RenderTemplateDirective(
                         BodyTemplate2(
                             back_button=BackButtonBehavior.VISIBLE,
-                            image=img, title=title,
-                            text_content=primary_text)))
+                            image=img,
+                            title=title,
+                            text_content=primary_text,
+                        )
+                    )
+                )
 
-            response_builder.speak(
-                util.get_speech_description(item)).ask(data.REPROMPT_SPEECH)
+            response_builder.speak(util.get_speech_description(item)).ask(data.REPROMPT_SPEECH)
 
         else:
-            response_builder.speak(
-                util.get_bad_answer(item)).ask(util.get_bad_answer(item))
+            response_builder.speak(util.get_bad_answer(item)).ask(util.get_bad_answer(item))
 
         return response_builder.response
 
@@ -230,11 +246,11 @@ class QuizAnswerHandler(AbstractRequestHandler):
     added to the Card or the RenderTemplate after checking if that
     is supported.
     """
+
     def can_handle(self, handler_input):
         # type: (HandlerInput) -> bool
         attr = handler_input.attributes_manager.session_attributes
-        return (is_intent_name("AnswerIntent")(handler_input) and
-                attr.get("state") == "QUIZ")
+        return is_intent_name("AnswerIntent")(handler_input) and attr.get("state") == "QUIZ"
 
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
@@ -245,8 +261,8 @@ class QuizAnswerHandler(AbstractRequestHandler):
         item = attr["quiz_item"]
         item_attr = attr["quiz_attr"]
         is_ans_correct = util.compare_token_or_slots(
-            handler_input=handler_input,
-            value=item[item_attr])
+            handler_input=handler_input, value=item[item_attr]
+        )
 
         if is_ans_correct:
             speech = util.get_speechcon(correct_answer=True)
@@ -257,10 +273,9 @@ class QuizAnswerHandler(AbstractRequestHandler):
 
         speech += util.get_answer(item_attr, item)
 
-        if attr['counter'] < data.MAX_QUESTIONS:
+        if attr["counter"] < data.MAX_QUESTIONS:
             # Ask another question
-            speech += util.get_current_score(
-                attr["quiz_score"], attr["counter"])
+            speech += util.get_current_score(attr["quiz_score"], attr["counter"])
             question = util.ask_question(handler_input)
             speech += question
             reprompt = question
@@ -276,22 +291,25 @@ class QuizAnswerHandler(AbstractRequestHandler):
                         text=question,
                         image=ui.Image(
                             small_image_url=util.get_small_image(item),
-                            large_image_url=util.get_large_image(item)
-                        )))
+                            large_image_url=util.get_large_image(item),
+                        ),
+                    )
+                )
 
             if util.supports_display(handler_input):
                 title = "Question #{}".format(str(attr["counter"]))
                 background_img = Image(
-                    sources=[ImageInstance(
-                        util.get_image(
-                            ht=1024, wd=600,
-                            label=attr["quiz_item"]["abbreviation"]))])
+                    sources=[
+                        ImageInstance(
+                            util.get_image(ht=1024, wd=600, label=attr["quiz_item"]["abbreviation"])
+                        )
+                    ]
+                )
                 item_list = []
-                for ans in util.get_multiple_choice_answers(
-                        item, item_attr, data.STATES_LIST):
-                    item_list.append(ListItem(
-                        token=ans,
-                        text_content=get_plain_text_content(primary_text=ans)))
+                for ans in util.get_multiple_choice_answers(item, item_attr, data.STATES_LIST):
+                    item_list.append(
+                        ListItem(token=ans, text_content=get_plain_text_content(primary_text=ans))
+                    )
 
                 response_builder.add_directive(
                     RenderTemplateDirective(
@@ -300,7 +318,10 @@ class QuizAnswerHandler(AbstractRequestHandler):
                             back_button=BackButtonBehavior.HIDDEN,
                             background_image=background_img,
                             title=title,
-                            list_items=item_list)))
+                            list_items=item_list,
+                        )
+                    )
+                )
             return response_builder.speak(speech).ask(reprompt).response
         else:
             # Finished all questions.
@@ -312,25 +333,29 @@ class QuizAnswerHandler(AbstractRequestHandler):
             if data.USE_CARDS_FLAG:
                 response_builder.set_card(
                     ui.StandardCard(
-                        title="Final Score".format(str(attr["counter"])),
-                        text=(util.get_final_score(
-                            attr["quiz_score"], attr["counter"]) +
-                              data.EXIT_SKILL_MESSAGE)
-                    ))
+                        title="Final Score",
+                        text=(
+                            util.get_final_score(attr["quiz_score"], attr["counter"])
+                            + data.EXIT_SKILL_MESSAGE
+                        ),
+                    )
+                )
 
             if util.supports_display(handler_input):
                 title = "Thank you for playing"
                 primary_text = get_rich_text_content(
-                    primary_text=util.get_final_score(
-                        attr["quiz_score"], attr["counter"]))
+                    primary_text=util.get_final_score(attr["quiz_score"], attr["counter"])
+                )
 
                 response_builder.add_directive(
                     RenderTemplateDirective(
                         BodyTemplate1(
                             back_button=BackButtonBehavior.HIDDEN,
                             title=title,
-                            text_content=primary_text
-                        )))
+                            text_content=primary_text,
+                        )
+                    )
+                )
 
             return response_builder.speak(speech).response
 
@@ -343,11 +368,13 @@ class QuizAnswerElementSelectedHandler(AbstractRequestHandler):
     rather than answering through voice. This calls the QuizAnswerHandler
     handle function directly, since the underlying logic of checking the
     answer and responding is the same."""
+
     def can_handle(self, handler_input):
         # type: (HandlerInput) -> bool
         attr = handler_input.attributes_manager.session_attributes
-        return (attr.get("state") == "QUIZ" and
-                is_request_type("Display.ElementSelected")(handler_input))
+        return attr.get("state") == "QUIZ" and is_request_type("Display.ElementSelected")(
+            handler_input
+        )
 
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
@@ -357,6 +384,7 @@ class QuizAnswerElementSelectedHandler(AbstractRequestHandler):
 
 class RepeatHandler(AbstractRequestHandler):
     """Handler for repeating the response to the user."""
+
     def can_handle(self, handler_input):
         # type: (HandlerInput) -> bool
         return is_intent_name("AMAZON.RepeatIntent")(handler_input)
@@ -368,8 +396,7 @@ class RepeatHandler(AbstractRequestHandler):
         response_builder = handler_input.response_builder
         if "recent_response" in attr:
             cached_response_str = json.dumps(attr["recent_response"])
-            cached_response = DefaultSerializer().deserialize(
-                cached_response_str, Response)
+            cached_response = DefaultSerializer().deserialize(cached_response_str, Response)
             return cached_response
         else:
             response_builder.speak(data.FALLBACK_ANSWER).ask(data.HELP_MESSAGE)
@@ -380,9 +407,10 @@ class RepeatHandler(AbstractRequestHandler):
 class FallbackIntentHandler(AbstractRequestHandler):
     """Handler for handling fallback intent.
 
-     2018-May-01: AMAZON.FallackIntent is only currently available in
-     en-US locale. This handler will not be triggered except in that
-     locale, so it can be safely deployed for any locale."""
+    2018-May-01: AMAZON.FallackIntent is only currently available in
+    en-US locale. This handler will not be triggered except in that
+    locale, so it can be safely deployed for any locale."""
+
     def can_handle(self, handler_input):
         # type: (HandlerInput) -> bool
         return is_intent_name("AMAZON.FallbackIntent")(handler_input)
@@ -390,8 +418,7 @@ class FallbackIntentHandler(AbstractRequestHandler):
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
         logger.info("In FallbackIntentHandler")
-        handler_input.response_builder.speak(
-            data.FALLBACK_ANSWER).ask(data.HELP_MESSAGE)
+        handler_input.response_builder.speak(data.FALLBACK_ANSWER).ask(data.HELP_MESSAGE)
 
         return handler_input.response_builder.response
 
@@ -406,6 +433,7 @@ class CacheResponseForRepeatInterceptor(AbstractResponseInterceptor):
     skill developer wants to repeat the same information back to
     the user.
     """
+
     def process(self, handler_input, response):
         # type: (HandlerInput, Response) -> None
         session_attr = handler_input.attributes_manager.session_attributes
@@ -418,6 +446,7 @@ class CatchAllExceptionHandler(AbstractExceptionHandler):
 
     This handler catches all kinds of exceptions and prints
     the stack trace on AWS Cloudwatch with the request envelope."""
+
     def can_handle(self, handler_input, exception):
         # type: (HandlerInput, Exception) -> bool
         return True
@@ -435,17 +464,18 @@ class CatchAllExceptionHandler(AbstractExceptionHandler):
 # Request and Response Loggers
 class RequestLogger(AbstractRequestInterceptor):
     """Log the request envelope."""
+
     def process(self, handler_input):
         # type: (HandlerInput) -> None
-        logger.info("Request Envelope: {}".format(
-            handler_input.request_envelope))
+        logger.info(f"Request Envelope: {handler_input.request_envelope}")
 
 
 class ResponseLogger(AbstractResponseInterceptor):
     """Log the response envelope."""
+
     def process(self, handler_input, response):
         # type: (HandlerInput, Response) -> None
-        logger.info("Response: {}".format(response))
+        logger.info(f"Response: {response}")
 
 
 # Add all request handlers to the skill.
