@@ -25,13 +25,16 @@
       },
       "isAvailableWorldwide": false,
       "testingInstructions": "Test in German (de-DE) locale. Say 'Alexa, öffne Mathe Quiz' to start. Try answering math questions with numbers. Test grade level changes with 'ich bin in der zweiten Klasse'.",
-      "distributionCountries": ["DE", "AT", "CH"]
+      "distributionCountries": [
+        "DE",
+        "AT",
+        "CH"
+      ]
     },
     "apis": {
       "custom": {
         "endpoint": {
-          "sourceDir": "lambda/py",
-          "uri": "ask-custom-MatheQuiz"
+          "uri": "arn:aws:lambda:eu-west-1:029722449475:function:alexa-skill-math"
         }
       }
     },

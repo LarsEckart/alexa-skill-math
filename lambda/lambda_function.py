@@ -29,7 +29,7 @@ from ask_sdk_core.dispatch_components import (
 from ask_sdk_core.serialize import DefaultSerializer
 from ask_sdk_core.skill_builder import CustomSkillBuilder
 from ask_sdk_core.utils import is_intent_name, is_request_type
-from ask_sdk_dynamodb_persistence_adapter import DynamoDbPersistenceAdapter
+from ask_sdk_dynamodb.adapter import DynamoDbAdapter
 from ask_sdk_model import Response
 
 from alexa import data
@@ -40,7 +40,7 @@ from alexa.srs import SpacedRepetition
 DYNAMODB_TABLE_NAME = os.environ.get("DYNAMODB_TABLE_NAME", "MathQuizUserData")
 
 # Persistence adapter for storing user data in DynamoDB
-persistence_adapter = DynamoDbPersistenceAdapter(
+persistence_adapter = DynamoDbAdapter(
     table_name=DYNAMODB_TABLE_NAME,
     partition_key_name="id",
     attribute_name="attributes",
@@ -293,9 +293,13 @@ class QuizHandler(AbstractRequestHandler):
         )(handler_input)
 
     def handle(self, handler_input):
-        logger.info("In QuizHandler")
-
         session_attr = handler_input.attributes_manager.session_attributes
+        old_questions_asked = session_attr.get("questions_asked", 0)
+        old_state = session_attr.get("state", "NONE")
+        logger.info(
+            f"QuizHandler: STARTING NEW QUIZ - previous state={old_state}, "
+            f"previous questions_asked={old_questions_asked}"
+        )
         srs = get_srs_from_session(handler_input)
 
         # Reset SRS session tracking
@@ -334,14 +338,19 @@ class AnswerIntentHandler(AbstractRequestHandler):
         )
 
     def handle(self, handler_input):
-        logger.info("In AnswerIntentHandler")
-
         session_attr = handler_input.attributes_manager.session_attributes
+        questions_asked = session_attr.get("questions_asked", 0)
+        correct_count = session_attr.get("correct_count", 0)
+        logger.info(
+            f"AnswerIntentHandler: questions_asked={questions_asked}, "
+            f"correct_count={correct_count}, MAX_QUESTIONS={data.MAX_QUESTIONS}"
+        )
+
         current_q = session_attr.get("current_question", {})
 
         # Get the user's answer
         slots = handler_input.request_envelope.request.intent.slots
-        answer_slot = slots.get("answer", {})
+        answer_slot = slots.get("number", {})
         user_answer = answer_slot.value if answer_slot else None
 
         # Validate answer
@@ -391,10 +400,15 @@ class AnswerIntentHandler(AbstractRequestHandler):
 
         # Check if quiz is complete
         questions_asked = session_attr.get("questions_asked", 0)
+        logger.info(
+            f"Quiz progress check: questions_asked={questions_asked}, "
+            f"MAX_QUESTIONS={data.MAX_QUESTIONS}, should_end={questions_asked >= data.MAX_QUESTIONS}"
+        )
 
         if questions_asked >= data.MAX_QUESTIONS:
             # Quiz complete
             correct_count = session_attr.get("correct_count", 0)
+            logger.info(f"QUIZ COMPLETE: correct={correct_count}, total={questions_asked}")
             end_message = get_quiz_end_message(correct_count, questions_asked)
 
             speech = feedback + " " + end_message + " " + data.EXIT_SKILL_MESSAGE
@@ -417,6 +431,10 @@ class AnswerIntentHandler(AbstractRequestHandler):
             session_attr["questions_asked"] = questions_asked + 1
             session_questions.append(next_question.question_id)
             session_attr["session_questions"] = session_questions
+            logger.info(
+                f"Next question: questions_asked now {questions_asked + 1}, "
+                f"question_id={next_question.question_id}"
+            )
 
             speech = feedback + " " + data.NEXT_QUESTION + next_question.question_text_german
             reprompt = next_question.question_text_german
