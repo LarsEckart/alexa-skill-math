@@ -1,5 +1,6 @@
 """Setup flow handlers for name and grade collection."""
 
+import contextlib
 import logging
 
 from ask_sdk_core.dispatch_components import AbstractRequestHandler
@@ -74,12 +75,26 @@ class SetupGradeHandler(AbstractRequestHandler):
 
         slots = handler_input.request_envelope.request.intent.slots
         grade_slot = slots.get("grade", {})
-        grade_value = grade_slot.value if grade_slot else None
+
+        # Try to get the resolved value (id) from slot resolution
+        grade = None
+        if grade_slot:
+            # First try to get the canonical ID from entity resolution
+            resolutions = getattr(grade_slot, "resolutions", None)
+            if resolutions and resolutions.resolutions_per_authority:
+                for resolution in resolutions.resolutions_per_authority:
+                    if resolution.status.code.value == "ER_SUCCESS_MATCH":
+                        grade = int(resolution.values[0].value.id)
+                        break
+
+            # Fallback: try to parse the raw value as integer
+            if grade is None and grade_slot.value:
+                with contextlib.suppress(ValueError):
+                    grade = int(grade_slot.value)
 
         session_attr = handler_input.attributes_manager.session_attributes
 
         try:
-            grade = int(grade_value) if grade_value else None
             if grade and 1 <= grade <= 4:
                 # Save grade to profile
                 pm = get_persistence_manager(handler_input)

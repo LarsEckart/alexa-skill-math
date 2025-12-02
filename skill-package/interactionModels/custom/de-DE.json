@@ -96,7 +96,7 @@
           "slots": [
             {
               "name": "grade",
-              "type": "AMAZON.NUMBER"
+              "type": "GRADE_NUMBER"
             }
           ],
           "samples": [
@@ -109,19 +109,7 @@
             "ich gehe in die {grade}",
             "ich gehe in die {grade} klasse",
             "ich bin in der {grade}",
-            "ich bin in der {grade} klasse",
-            "erste",
-            "zweite",
-            "dritte",
-            "vierte",
-            "erste klasse",
-            "zweite klasse",
-            "dritte klasse",
-            "vierte klasse",
-            "in die erste",
-            "in die zweite",
-            "in die dritte",
-            "in die vierte"
+            "ich bin in der {grade} klasse"
           ]
         },
         {
@@ -165,6 +153,39 @@
         }
       ],
       "types": [
+        {
+          "name": "GRADE_NUMBER",
+          "values": [
+            {
+              "id": "1",
+              "name": {
+                "value": "erste",
+                "synonyms": ["ersten", "erster", "eins", "1"]
+              }
+            },
+            {
+              "id": "2",
+              "name": {
+                "value": "zweite",
+                "synonyms": ["zweiten", "zweiter", "zwei", "2"]
+              }
+            },
+            {
+              "id": "3",
+              "name": {
+                "value": "dritte",
+                "synonyms": ["dritten", "dritter", "drei", "3"]
+              }
+            },
+            {
+              "id": "4",
+              "name": {
+                "value": "vierte",
+                "synonyms": ["vierten", "vierter", "vier", "4"]
+              }
+            }
+          ]
+        },
         {
           "name": "DIFFICULTY_DIRECTION",
           "values": [
