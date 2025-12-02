@@ -1,34 +1,40 @@
 {
-    "manifest": {
-      "publishingInformation": {
-        "locales": {
-          "en-US": {
-            "summary": "Test your knowledge of the US states and their capitals.",
-            "examplePhrases": [
-              "Alexa, open States Quiz",
-              "Alexa, play States Quiz"
-            ],
-            "keywords": [
-              "quiz",
-              "games",
-              "geography"
-            ],
-            "name": "States Quiz",
-            "description": "Test your knowledge of the US states and their capitals.\n\nStates Quiz provides a fun way to keep your U.S. geography skills sharp.\n\nTo start, just say \"Alexa, launch States Quiz\" or \"Alexa, open States Quiz\" to start the game\".\n\nAt anytime, you can stop the game by saying \"Alexa, stop\""
-          }
-        },
-        "isAvailableWorldwide": true,
-        "testingInstructions": "Include your testing instruction (if any) here",
-        "distributionCountries": []
-      },
-      "apis": {
-        "custom": {
-          "endpoint": {
-            "sourceDir": "lambda/py",
-            "uri": "ask-custom-StatesQuiz"
-          }
+  "manifest": {
+    "publishingInformation": {
+      "locales": {
+        "de-DE": {
+          "summary": "Übe Mathe mit diesem interaktiven Quiz für Grundschulkinder.",
+          "examplePhrases": [
+            "Alexa, öffne Mathe Quiz",
+            "Alexa, starte Mathe Quiz",
+            "Alexa, frag Mathe Quiz nach einer Aufgabe"
+          ],
+          "keywords": [
+            "mathe",
+            "quiz",
+            "rechnen",
+            "grundschule",
+            "lernen",
+            "kinder",
+            "mathematik",
+            "übung"
+          ],
+          "name": "Mathe Quiz",
+          "description": "Mathe Quiz ist ein interaktiver Rechen-Trainer für Grundschulkinder.\n\nÜbe Addition, Subtraktion, Multiplikation und Division auf spielerische Weise. Das Quiz passt sich automatisch an das Niveau deines Kindes an und wächst mit - von der ersten bis zur vierten Klasse.\n\nFeatures:\n• Anpassbare Schwierigkeitsstufen (Klasse 1-4)\n• Fortschrittsverfolgung über mehrere Sitzungen\n• Intelligentes Wiederholungssystem für effektives Lernen\n• Motivierende Rückmeldungen\n\nZum Starten sage einfach: \"Alexa, öffne Mathe Quiz\" oder \"Alexa, starte Mathe Quiz\".\n\nDu kannst jederzeit \"Alexa, stopp\" sagen, um das Quiz zu beenden."
         }
       },
-      "manifestVersion": "1.0"
-    }
+      "isAvailableWorldwide": false,
+      "testingInstructions": "Test in German (de-DE) locale. Say 'Alexa, öffne Mathe Quiz' to start. Try answering math questions with numbers. Test grade level changes with 'ich bin in der zweiten Klasse'.",
+      "distributionCountries": ["DE", "AT", "CH"]
+    },
+    "apis": {
+      "custom": {
+        "endpoint": {
+          "sourceDir": "lambda/py",
+          "uri": "ask-custom-MatheQuiz"
+        }
+      }
+    },
+    "manifestVersion": "1.0"
   }
+}

@@ -1,0 +1,156 @@
+{
+  "interactionModel": {
+    "languageModel": {
+      "invocationName": "mathe quiz",
+      "intents": [
+        {
+          "name": "AMAZON.CancelIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.HelpIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.StopIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.RepeatIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.FallbackIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.StartOverIntent",
+          "samples": []
+        },
+        {
+          "name": "QuizIntent",
+          "samples": [
+            "starte ein quiz",
+            "starte das quiz",
+            "lass uns rechnen",
+            "neue runde",
+            "üben",
+            "lass uns üben",
+            "rechnen üben",
+            "mathe üben",
+            "eine aufgabe",
+            "neue aufgabe",
+            "nächste aufgabe",
+            "los gehts",
+            "fang an",
+            "starten",
+            "quiz starten",
+            "spiel starten"
+          ]
+        },
+        {
+          "name": "AnswerIntent",
+          "slots": [
+            {
+              "name": "number",
+              "type": "AMAZON.NUMBER"
+            }
+          ],
+          "samples": [
+            "{number}",
+            "die antwort ist {number}",
+            "das ist {number}",
+            "ich glaube {number}",
+            "das ergebnis ist {number}",
+            "das macht {number}",
+            "es ist {number}",
+            "ich sage {number}",
+            "meine antwort ist {number}",
+            "{number} ist die antwort",
+            "{number} ist meine antwort",
+            "ich denke {number}",
+            "ich tippe auf {number}"
+          ]
+        },
+        {
+          "name": "SetDifficultyIntent",
+          "slots": [
+            {
+              "name": "grade",
+              "type": "GRADE_LEVEL"
+            }
+          ],
+          "samples": [
+            "mach es leichter",
+            "mach es einfacher",
+            "mach es schwerer",
+            "mach es schwieriger",
+            "zu schwer",
+            "zu leicht",
+            "ich bin in der {grade} klasse",
+            "ich bin in klasse {grade}",
+            "{grade} klasse",
+            "klasse {grade}",
+            "setze schwierigkeit auf {grade}",
+            "niveau {grade}",
+            "stufe {grade}",
+            "ich bin {grade} klasse",
+            "erste klasse niveau",
+            "zweite klasse niveau",
+            "dritte klasse niveau",
+            "vierte klasse niveau"
+          ]
+        },
+        {
+          "name": "ProgressIntent",
+          "samples": [
+            "wie gut bin ich",
+            "meine punkte",
+            "wie ist mein stand",
+            "statistik",
+            "zeig mir meine statistik",
+            "wie viele punkte habe ich",
+            "mein fortschritt",
+            "wie war ich",
+            "meine ergebnisse",
+            "zeig meinen fortschritt",
+            "wie läuft es",
+            "wie mache ich mich",
+            "mein ergebnis"
+          ]
+        }
+      ],
+      "types": [
+        {
+          "name": "GRADE_LEVEL",
+          "values": [
+            {
+              "name": {
+                "value": "erste",
+                "synonyms": ["1", "eins", "ersten", "erster"]
+              }
+            },
+            {
+              "name": {
+                "value": "zweite",
+                "synonyms": ["2", "zwei", "zweiten", "zweiter"]
+              }
+            },
+            {
+              "name": {
+                "value": "dritte",
+                "synonyms": ["3", "drei", "dritten", "dritter"]
+              }
+            },
+            {
+              "name": {
+                "value": "vierte",
+                "synonyms": ["4", "vier", "vierten", "vierter"]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
