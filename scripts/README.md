@@ -2,7 +2,25 @@
 
 Simple bash scripts for managing AWS resources for the Math Quiz Alexa Skill.
 
-## Prerequisites
+## CI/CD
+
+The project uses GitHub Actions for continuous deployment. On every push to `main` that changes files in `lambda/`:
+
+1. **Test job**: Runs linting and unit tests
+2. **Deploy job**: Packages and deploys to AWS Lambda
+
+### Required GitHub Secrets
+
+Configure these secrets in your repository settings (Settings → Secrets and variables → Actions):
+
+| Secret | Description |
+|--------|-------------|
+| `AWS_ACCESS_KEY_ID` | AWS access key for the `math-quiz-dev` IAM user |
+| `AWS_SECRET_ACCESS_KEY` | AWS secret key for the `math-quiz-dev` IAM user |
+
+## Local Development
+
+### Prerequisites
 
 - AWS CLI installed and configured
 - The scripts use the `math-quiz-dev` AWS profile by default

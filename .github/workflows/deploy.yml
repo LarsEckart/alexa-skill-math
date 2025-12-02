@@ -1,0 +1,96 @@
+name: Deploy to AWS Lambda
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'lambda/**'
+      - '.github/workflows/deploy.yml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: lambda
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          version: "latest"
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Run linting
+        run: |
+          uv run ruff format --check .
+          uv run ruff check .
+
+      - name: Run tests
+        run: uv run pytest tests/ -v --ignore=tests/test_persistence.py
+        # Note: test_persistence.py requires LocalStack/Docker, skipped in CI
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: lambda
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          version: "latest"
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-1
+
+      - name: Create deployment package
+        run: |
+          # Create temp directory for package
+          mkdir -p /tmp/lambda-package
+          
+          # Export and install production dependencies
+          uv export --no-dev --no-hashes --frozen | uv pip install \
+              --quiet \
+              --python 3.12 \
+              --target /tmp/lambda-package \
+              --requirement -
+          
+          # Copy application code
+          cp lambda_function.py /tmp/lambda-package/
+          cp -r alexa /tmp/lambda-package/
+          
+          # Create zip
+          cd /tmp/lambda-package
+          zip -q -r /tmp/lambda.zip .
+          
+          echo "Package size: $(du -h /tmp/lambda.zip | cut -f1)"
+
+      - name: Deploy to Lambda
+        run: |
+          aws lambda update-function-code \
+              --function-name alexa-skill-math \
+              --zip-file fileb:///tmp/lambda.zip \
+              --output json | grep -E '"FunctionArn"|"LastModified"|"CodeSize"'
+          
+          echo ""
+          echo "✅ Lambda deployed successfully!"
