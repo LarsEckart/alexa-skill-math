@@ -4,7 +4,7 @@ from alexa.handlers.launch import LaunchRequestHandler
 from alexa.handlers.progress import ProgressHandler
 from alexa.handlers.quiz import AnswerIntentHandler, QuizHandler
 from alexa.handlers.settings import SetDifficultyHandler
-from alexa.handlers.setup import SetupGradeHandler, SetupNameHandler
+from alexa.handlers.setup import SelectPlayerHandler, SetupGradeHandler
 from alexa.handlers.standard import (
     ExitIntentHandler,
     FallbackIntentHandler,
@@ -15,7 +15,7 @@ from alexa.handlers.standard import (
 
 __all__ = [
     "LaunchRequestHandler",
-    "SetupNameHandler",
+    "SelectPlayerHandler",
     "SetupGradeHandler",
     "QuizHandler",
     "AnswerIntentHandler",

@@ -20,10 +20,10 @@ from alexa.handlers import (
     ProgressHandler,
     QuizHandler,
     RepeatHandler,
+    SelectPlayerHandler,
     SessionEndedRequestHandler,
     SetDifficultyHandler,
     SetupGradeHandler,
-    SetupNameHandler,
 )
 from alexa.interceptors import (
     CacheResponseForRepeatInterceptor,
@@ -52,7 +52,7 @@ sb = CustomSkillBuilder(persistence_adapter=persistence_adapter)
 
 # Add request handlers (order matters - more specific handlers first)
 sb.add_request_handler(LaunchRequestHandler())
-sb.add_request_handler(SetupNameHandler())
+sb.add_request_handler(SelectPlayerHandler())
 sb.add_request_handler(SetupGradeHandler())
 sb.add_request_handler(QuizHandler())
 sb.add_request_handler(AnswerIntentHandler())

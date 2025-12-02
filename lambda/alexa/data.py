@@ -15,31 +15,29 @@ MAX_QUESTIONS = 10
 # Welcome and Launch Messages
 # ============================================================================
 
-WELCOME_MESSAGE_FIRST_TIME = (
-    "Hallo! Willkommen beim Mathe-Quiz! "
-    "Ich bin dein Rechentrainer und helfe dir, besser in Mathe zu werden. "
-    "Wie heißt du denn?"
-)
+WELCOME_MESSAGE = "Hallo! Willkommen beim Mathe-Quiz! Wer spielt heute?"
 
 WELCOME_MESSAGE_RETURNING = (
-    "Willkommen zurück, {name}! "
+    "Hallo {name}! Schön, dass du wieder da bist. "
     "Beim letzten Mal hattest du {correct} von {total} richtig. "
     "Möchtest du wieder üben?"
 )
 
 WELCOME_MESSAGE_RETURNING_NO_STATS = (
-    "Willkommen zurück, {name}! Schön, dass du wieder da bist. Möchtest du rechnen üben?"
+    "Hallo {name}! Schön, dass du wieder da bist. Möchtest du rechnen üben?"
 )
 
-WELCOME_MESSAGE_UNNAMED = "Willkommen zurück beim Mathe-Quiz! Möchtest du wieder rechnen üben?"
+WELCOME_MESSAGE_NEW_PLAYER = (
+    "Hallo {name}! Schön dich kennenzulernen. In welche Klasse gehst du? Erste bis vierte?"
+)
 
 # ============================================================================
 # Setup Flow Messages
 # ============================================================================
 
-ASK_NAME = "Wie heißt du denn?"
+ASK_PLAYER = "Wer spielt heute?"
 
-ASK_GRADE = "Hallo {name}! Schön dich kennenzulernen. In welche Klasse gehst du? Erste bis vierte?"
+ASK_GRADE = "In welche Klasse gehst du, {name}? Erste bis vierte?"
 
 CONFIRM_GRADE = "Prima! Du bist also in der {grade}. Klasse. Lass uns anfangen!"
 
@@ -241,7 +239,7 @@ OPERATION_NAMES_FRIENDLY = {
 # ============================================================================
 
 STATE_NONE = "NONE"
-STATE_SETUP_NAME = "SETUP_NAME"
+STATE_ASK_PLAYER = "ASK_PLAYER"
 STATE_SETUP_GRADE = "SETUP_GRADE"
 STATE_QUIZ = "QUIZ"
 

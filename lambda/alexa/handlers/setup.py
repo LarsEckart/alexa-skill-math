@@ -1,4 +1,4 @@
-"""Setup flow handlers for name and grade collection."""
+"""Setup flow handlers for player selection and grade collection."""
 
 import contextlib
 import logging
@@ -12,45 +12,69 @@ from alexa.persistence import get_persistence_manager
 logger = logging.getLogger(__name__)
 
 
-class SetupNameHandler(AbstractRequestHandler):
+class SelectPlayerHandler(AbstractRequestHandler):
     """
-    Handler for capturing user's name during setup.
+    Handler for selecting which player is playing.
 
-    Triggered when user provides their name in the setup flow.
+    Triggered when user provides their name at the start of a session.
+    Routes to grade setup for new players, or welcome for returning players.
     """
 
     def can_handle(self, handler_input):
         session_attr = handler_input.attributes_manager.session_attributes
         return (
             is_intent_name("SetNameIntent")(handler_input)
-            and session_attr.get("state") == data.STATE_SETUP_NAME
+            and session_attr.get("state") == data.STATE_ASK_PLAYER
         )
 
     def handle(self, handler_input):
-        logger.info("In SetupNameHandler")
+        logger.info("In SelectPlayerHandler")
 
         slots = handler_input.request_envelope.request.intent.slots
-        name = slots.get("name", {})
-        name_value = name.value if name else None
+        name_slot = slots.get("name", {})
+        name_value = name_slot.value if name_slot else None
 
         session_attr = handler_input.attributes_manager.session_attributes
 
-        if name_value:
-            # Save name to profile
-            pm = get_persistence_manager(handler_input)
-            profile = pm.get_user_profile()
-            profile.name = name_value
-            pm.save_user_profile(profile)
+        if not name_value:
+            speech = data.ASK_PLAYER
+            reprompt = data.ASK_PLAYER
+            handler_input.response_builder.speak(speech).ask(reprompt)
+            return handler_input.response_builder.response
+
+        # Set the current player
+        pm = get_persistence_manager(handler_input)
+        pm.set_current_player(name_value)
+
+        # Store in session for display (preserve original casing)
+        session_attr["current_player"] = name_value.lower().strip()
+        session_attr["current_player_display"] = name_value
+
+        if pm.is_new_player():
+            # New player - ask for grade
+            session_attr["state"] = data.STATE_SETUP_GRADE
+            speech = data.WELCOME_MESSAGE_NEW_PLAYER.format(name=name_value)
+            reprompt = data.ASK_GRADE.format(name=name_value)
+        else:
+            # Returning player - welcome back
+            session_stats = pm.get_session_stats()
             pm.increment_session_count()
             pm.commit()
 
-            # Move to grade setup
-            session_attr["state"] = data.STATE_SETUP_GRADE
-            speech = data.ASK_GRADE.format(name=name_value)
-            reprompt = data.INVALID_GRADE
-        else:
-            speech = data.ASK_NAME
-            reprompt = data.ASK_NAME
+            total = session_stats.get("total_questions", 0)
+            correct = session_stats.get("total_correct", 0)
+
+            if total > 0:
+                speech = data.WELCOME_MESSAGE_RETURNING.format(
+                    name=name_value,
+                    correct=correct,
+                    total=total,
+                )
+            else:
+                speech = data.WELCOME_MESSAGE_RETURNING_NO_STATS.format(name=name_value)
+
+            reprompt = data.REPROMPT_GENERAL
+            session_attr["state"] = data.STATE_NONE
 
         handler_input.response_builder.speak(speech).ask(reprompt)
         return handler_input.response_builder.response
@@ -58,7 +82,7 @@ class SetupNameHandler(AbstractRequestHandler):
 
 class SetupGradeHandler(AbstractRequestHandler):
     """
-    Handler for capturing user's grade level during setup.
+    Handler for capturing player's grade level during setup.
 
     Triggered when user provides their grade in the setup flow.
     """
@@ -101,6 +125,7 @@ class SetupGradeHandler(AbstractRequestHandler):
                 profile = pm.get_user_profile()
                 profile.grade = grade
                 pm.save_user_profile(profile)
+                pm.increment_session_count()
                 pm.commit()
 
                 grade_name = data.GRADE_NAMES.get(grade, str(grade))
@@ -110,11 +135,13 @@ class SetupGradeHandler(AbstractRequestHandler):
                 speech += " " + data.REPROMPT_GENERAL
                 reprompt = data.REPROMPT_GENERAL
             else:
+                player_name = session_attr.get("current_player_display", "")
                 speech = data.INVALID_GRADE
-                reprompt = data.INVALID_GRADE
+                reprompt = data.ASK_GRADE.format(name=player_name)
         except (ValueError, TypeError):
+            player_name = session_attr.get("current_player_display", "")
             speech = data.INVALID_GRADE
-            reprompt = data.INVALID_GRADE
+            reprompt = data.ASK_GRADE.format(name=player_name)
 
         handler_input.response_builder.speak(speech).ask(reprompt)
         return handler_input.response_builder.response

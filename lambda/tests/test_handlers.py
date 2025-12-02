@@ -177,44 +177,21 @@ class TestLaunchRequestHandler:
             handler = LaunchRequestHandler()
             assert handler.can_handle(mock_handler_input)
 
-    @patch("alexa.handlers.launch.get_persistence_manager")
-    def test_handle_first_time_user(self, mock_get_pm, mock_handler_input):
-        """Test launch for first-time user starts setup flow."""
-        pm = MagicMock()
-        pm.is_first_time_user.return_value = True
-        mock_get_pm.return_value = pm
-
+    def test_handle_asks_who_is_playing(self, mock_handler_input):
+        """Test launch always asks who is playing."""
         handler = LaunchRequestHandler()
         handler.handle(mock_handler_input)
 
-        # Should ask for name
+        # Should ask who's playing
         speak_call = mock_handler_input.response_builder.speak.call_args
         speech = speak_call[0][0]
-        assert "name" in speech.lower() or "heißt" in speech.lower()
+        assert "wer" in speech.lower() or "spielt" in speech.lower()
 
-        # Session state should be SETUP_NAME
+        # Session state should be ASK_PLAYER
         assert (
             mock_handler_input.attributes_manager.session_attributes["state"]
-            == data.STATE_SETUP_NAME
+            == data.STATE_ASK_PLAYER
         )
-
-    @patch("alexa.handlers.launch.get_persistence_manager")
-    def test_handle_returning_user_with_name(
-        self, mock_get_pm, mock_handler_input, mock_persistence_manager
-    ):
-        """Test launch for returning user with name shows personalized welcome."""
-        mock_get_pm.return_value = mock_persistence_manager
-
-        handler = LaunchRequestHandler()
-        handler.handle(mock_handler_input)
-
-        speak_call = mock_handler_input.response_builder.speak.call_args
-        speech = speak_call[0][0]
-
-        # Should include the user's name
-        assert "Max" in speech
-        # Should mention stats
-        assert "40" in speech and "50" in speech
 
 
 # ============================================================================
@@ -734,7 +711,7 @@ class TestDataModule:
 
     def test_german_messages_exist(self):
         """Test that all required German messages are defined."""
-        assert data.WELCOME_MESSAGE_FIRST_TIME
+        assert data.WELCOME_MESSAGE
         assert data.WELCOME_MESSAGE_RETURNING
         assert data.START_QUIZ_MESSAGE
         assert data.EXIT_SKILL_MESSAGE
@@ -764,6 +741,6 @@ class TestDataModule:
     def test_states_are_defined(self):
         """Test that session states are defined."""
         assert data.STATE_NONE == "NONE"
-        assert data.STATE_SETUP_NAME == "SETUP_NAME"
+        assert data.STATE_ASK_PLAYER == "ASK_PLAYER"
         assert data.STATE_SETUP_GRADE == "SETUP_GRADE"
         assert data.STATE_QUIZ == "QUIZ"
