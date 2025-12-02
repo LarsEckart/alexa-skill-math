@@ -73,11 +73,63 @@
           ]
         },
         {
-          "name": "SetDifficultyIntent",
+          "name": "SetNameIntent",
+          "slots": [
+            {
+              "name": "name",
+              "type": "AMAZON.FirstName"
+            }
+          ],
+          "samples": [
+            "{name}",
+            "ich heiße {name}",
+            "ich bin {name}",
+            "mein name ist {name}",
+            "{name} heiße ich",
+            "man nennt mich {name}",
+            "ich bin der {name}",
+            "ich bin die {name}"
+          ]
+        },
+        {
+          "name": "SetGradeIntent",
           "slots": [
             {
               "name": "grade",
-              "type": "GRADE_LEVEL"
+              "type": "AMAZON.NUMBER"
+            }
+          ],
+          "samples": [
+            "{grade}",
+            "in die {grade}",
+            "in der {grade}",
+            "{grade} klasse",
+            "klasse {grade}",
+            "in die {grade} klasse",
+            "ich gehe in die {grade}",
+            "ich gehe in die {grade} klasse",
+            "ich bin in der {grade}",
+            "ich bin in der {grade} klasse",
+            "erste",
+            "zweite",
+            "dritte",
+            "vierte",
+            "erste klasse",
+            "zweite klasse",
+            "dritte klasse",
+            "vierte klasse",
+            "in die erste",
+            "in die zweite",
+            "in die dritte",
+            "in die vierte"
+          ]
+        },
+        {
+          "name": "SetDifficultyIntent",
+          "slots": [
+            {
+              "name": "direction",
+              "type": "DIFFICULTY_DIRECTION"
             }
           ],
           "samples": [
@@ -87,18 +139,10 @@
             "mach es schwieriger",
             "zu schwer",
             "zu leicht",
-            "ich bin in der {grade} klasse",
-            "ich bin in klasse {grade}",
-            "{grade} klasse",
-            "klasse {grade}",
-            "setze schwierigkeit auf {grade}",
-            "niveau {grade}",
-            "stufe {grade}",
-            "ich bin {grade} klasse",
-            "erste klasse niveau",
-            "zweite klasse niveau",
-            "dritte klasse niveau",
-            "vierte klasse niveau"
+            "einfacher bitte",
+            "schwerer bitte",
+            "leichtere aufgaben",
+            "schwerere aufgaben"
           ]
         },
         {
@@ -122,30 +166,18 @@
       ],
       "types": [
         {
-          "name": "GRADE_LEVEL",
+          "name": "DIFFICULTY_DIRECTION",
           "values": [
             {
               "name": {
-                "value": "erste",
-                "synonyms": ["1", "eins", "ersten", "erster"]
+                "value": "leichter",
+                "synonyms": ["einfacher", "leicht", "einfach"]
               }
             },
             {
               "name": {
-                "value": "zweite",
-                "synonyms": ["2", "zwei", "zweiten", "zweiter"]
-              }
-            },
-            {
-              "name": {
-                "value": "dritte",
-                "synonyms": ["3", "drei", "dritten", "dritter"]
-              }
-            },
-            {
-              "name": {
-                "value": "vierte",
-                "synonyms": ["4", "vier", "vierten", "vierter"]
+                "value": "schwerer",
+                "synonyms": ["schwieriger", "schwer", "schwierig"]
               }
             }
           ]
