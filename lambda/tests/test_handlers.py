@@ -5,24 +5,30 @@ These tests verify the behavior of all intent handlers for the
 German Math Quiz skill.
 """
 
-import sys
 from unittest.mock import MagicMock, patch
 
 import pytest
 
 from alexa import data
+from alexa.handlers import (
+    AnswerIntentHandler,
+    ExitIntentHandler,
+    FallbackIntentHandler,
+    HelpIntentHandler,
+    LaunchRequestHandler,
+    ProgressHandler,
+    QuizHandler,
+    RepeatHandler,
+    SetDifficultyHandler,
+)
+from alexa.handlers.helpers import (
+    get_correct_feedback,
+    get_incorrect_feedback,
+    get_quiz_end_message,
+    serialize_question,
+)
 from alexa.math_questions import MathQuestion, Operation
 from alexa.models import UserProfile
-
-# ============================================================================
-# Mock the DynamoDB module before importing lambda_function
-# ============================================================================
-
-# Create a mock module for ask_sdk_dynamodb_persistence_adapter
-mock_dynamo_module = MagicMock()
-mock_dynamo_module.DynamoDbPersistenceAdapter = MagicMock(return_value=MagicMock())
-sys.modules["ask_sdk_dynamodb_persistence_adapter"] = mock_dynamo_module
-
 
 # ============================================================================
 # Test Fixtures
@@ -94,12 +100,10 @@ def sample_question():
 
 
 class TestHelperFunctions:
-    """Tests for helper functions in lambda_function."""
+    """Tests for helper functions in alexa.handlers.helpers."""
 
     def test_get_correct_feedback(self):
         """Test that correct feedback contains the answer or is a positive affirmation."""
-        from lambda_function import get_correct_feedback
-
         feedback = get_correct_feedback(42)
         feedback_lower = feedback.lower()
         # Should either contain the answer or be a positive affirmation
@@ -121,43 +125,31 @@ class TestHelperFunctions:
 
     def test_get_incorrect_feedback(self):
         """Test that incorrect feedback contains the correct answer."""
-        from lambda_function import get_incorrect_feedback
-
         feedback = get_incorrect_feedback(7, 5, "add", 12)
         assert "12" in feedback
 
     def test_get_quiz_end_message_perfect(self):
         """Test quiz end message for perfect score."""
-        from lambda_function import get_quiz_end_message
-
         message = get_quiz_end_message(10, 10)
         assert "perfekt" in message.lower() or "champion" in message.lower()
 
     def test_get_quiz_end_message_great(self):
         """Test quiz end message for great score (80%+)."""
-        from lambda_function import get_quiz_end_message
-
         message = get_quiz_end_message(8, 10)
         assert "super" in message.lower() or "toll" in message.lower()
 
     def test_get_quiz_end_message_good(self):
         """Test quiz end message for good score (50%+)."""
-        from lambda_function import get_quiz_end_message
-
         message = get_quiz_end_message(6, 10)
         assert "gut" in message.lower()
 
     def test_get_quiz_end_message_needs_practice(self):
         """Test quiz end message for low score (<50%)."""
-        from lambda_function import get_quiz_end_message
-
         message = get_quiz_end_message(3, 10)
         assert "übung" in message.lower()
 
     def test_serialize_question(self, sample_question):
         """Test question serialization for session storage."""
-        from lambda_function import serialize_question
-
         serialized = serialize_question(sample_question)
 
         assert serialized["question_id"] == "add_7_5"
@@ -178,20 +170,16 @@ class TestLaunchRequestHandler:
 
     def test_can_handle_launch_request(self, mock_handler_input):
         """Test that handler can handle LaunchRequest."""
-        from lambda_function import LaunchRequestHandler
-
         mock_handler_input.request_envelope.request.object_type = "LaunchRequest"
 
-        with patch("lambda_function.is_request_type") as mock_is_request:
+        with patch("alexa.handlers.launch.is_request_type") as mock_is_request:
             mock_is_request.return_value = lambda x: True
             handler = LaunchRequestHandler()
             assert handler.can_handle(mock_handler_input)
 
-    @patch("lambda_function.get_persistence_manager")
+    @patch("alexa.handlers.launch.get_persistence_manager")
     def test_handle_first_time_user(self, mock_get_pm, mock_handler_input):
         """Test launch for first-time user starts setup flow."""
-        from lambda_function import LaunchRequestHandler
-
         pm = MagicMock()
         pm.is_first_time_user.return_value = True
         mock_get_pm.return_value = pm
@@ -210,14 +198,12 @@ class TestLaunchRequestHandler:
             == data.STATE_SETUP_NAME
         )
 
-    @patch("lambda_function.get_persistence_manager")
+    @patch("alexa.handlers.launch.get_persistence_manager")
     def test_handle_returning_user_with_name(
         self, mock_get_pm, mock_handler_input, mock_persistence_manager
     ):
         """Test launch for returning user with name shows personalized welcome."""
         mock_get_pm.return_value = mock_persistence_manager
-
-        from lambda_function import LaunchRequestHandler
 
         handler = LaunchRequestHandler()
         handler.handle(mock_handler_input)
@@ -241,21 +227,17 @@ class TestQuizHandler:
 
     def test_can_handle_quiz_intent(self, mock_handler_input):
         """Test that handler can handle QuizIntent."""
-        from lambda_function import QuizHandler
-
-        with patch("lambda_function.is_intent_name") as mock_is_intent:
+        with patch("alexa.handlers.quiz.is_intent_name") as mock_is_intent:
             mock_is_intent.return_value = lambda x: True
             handler = QuizHandler()
             assert handler.can_handle(mock_handler_input)
 
-    @patch("lambda_function.get_srs_from_session")
-    @patch("lambda_function.get_persistence_manager")
+    @patch("alexa.handlers.quiz.get_srs_from_session")
+    @patch("alexa.handlers.quiz.get_persistence_manager")
     def test_handle_starts_quiz(
         self, mock_get_pm, mock_get_srs, mock_handler_input, sample_question
     ):
         """Test that quiz handler initializes quiz state correctly."""
-        from lambda_function import QuizHandler
-
         srs = MagicMock()
         srs.get_next_question.return_value = sample_question
         mock_get_srs.return_value = srs
@@ -287,29 +269,25 @@ class TestAnswerIntentHandler:
 
     def test_can_handle_answer_during_quiz(self, mock_handler_input):
         """Test that handler only handles answers during quiz state."""
-        from lambda_function import AnswerIntentHandler
-
         mock_handler_input.attributes_manager.session_attributes["state"] = data.STATE_QUIZ
 
-        with patch("lambda_function.is_intent_name") as mock_is_intent:
+        with patch("alexa.handlers.quiz.is_intent_name") as mock_is_intent:
             mock_is_intent.return_value = lambda x: True
             handler = AnswerIntentHandler()
             assert handler.can_handle(mock_handler_input)
 
     def test_cannot_handle_answer_outside_quiz(self, mock_handler_input):
         """Test that handler doesn't handle answers outside quiz."""
-        from lambda_function import AnswerIntentHandler
-
         mock_handler_input.attributes_manager.session_attributes["state"] = data.STATE_NONE
 
-        with patch("lambda_function.is_intent_name") as mock_is_intent:
+        with patch("alexa.handlers.quiz.is_intent_name") as mock_is_intent:
             mock_is_intent.return_value = lambda x: True
             handler = AnswerIntentHandler()
             assert not handler.can_handle(mock_handler_input)
 
-    @patch("lambda_function.save_srs_state")
-    @patch("lambda_function.get_srs_from_session")
-    @patch("lambda_function.get_persistence_manager")
+    @patch("alexa.handlers.quiz.save_srs_state")
+    @patch("alexa.handlers.quiz.get_srs_from_session")
+    @patch("alexa.handlers.quiz.get_persistence_manager")
     def test_handle_correct_answer(
         self,
         mock_get_pm,
@@ -320,8 +298,6 @@ class TestAnswerIntentHandler:
         sample_question,
     ):
         """Test handling a correct answer."""
-        from lambda_function import AnswerIntentHandler
-
         mock_get_pm.return_value = mock_persistence_manager
 
         srs = MagicMock()
@@ -345,7 +321,7 @@ class TestAnswerIntentHandler:
         session_attr["session_questions"] = ["add_7_5"]
 
         # Setup slots with correct answer
-        mock_handler_input.request_envelope.request.intent.slots = {"answer": MagicMock(value="12")}
+        mock_handler_input.request_envelope.request.intent.slots = {"number": MagicMock(value="12")}
 
         handler = AnswerIntentHandler()
         handler.handle(mock_handler_input)
@@ -364,9 +340,9 @@ class TestAnswerIntentHandler:
             f"Expected positive feedback in: {speech}"
         )
 
-    @patch("lambda_function.save_srs_state")
-    @patch("lambda_function.get_srs_from_session")
-    @patch("lambda_function.get_persistence_manager")
+    @patch("alexa.handlers.quiz.save_srs_state")
+    @patch("alexa.handlers.quiz.get_srs_from_session")
+    @patch("alexa.handlers.quiz.get_persistence_manager")
     def test_handle_incorrect_answer(
         self,
         mock_get_pm,
@@ -377,8 +353,6 @@ class TestAnswerIntentHandler:
         sample_question,
     ):
         """Test handling an incorrect answer."""
-        from lambda_function import AnswerIntentHandler
-
         mock_get_pm.return_value = mock_persistence_manager
 
         srs = MagicMock()
@@ -402,7 +376,7 @@ class TestAnswerIntentHandler:
         session_attr["session_questions"] = ["add_7_5"]
 
         # Setup slots with incorrect answer
-        mock_handler_input.request_envelope.request.intent.slots = {"answer": MagicMock(value="15")}
+        mock_handler_input.request_envelope.request.intent.slots = {"number": MagicMock(value="15")}
 
         handler = AnswerIntentHandler()
         handler.handle(mock_handler_input)
@@ -418,15 +392,13 @@ class TestAnswerIntentHandler:
         speech = speak_call[0][0]
         assert "12" in speech
 
-    @patch("lambda_function.save_srs_state")
-    @patch("lambda_function.get_srs_from_session")
-    @patch("lambda_function.get_persistence_manager")
+    @patch("alexa.handlers.quiz.save_srs_state")
+    @patch("alexa.handlers.quiz.get_srs_from_session")
+    @patch("alexa.handlers.quiz.get_persistence_manager")
     def test_handle_invalid_answer(
         self, mock_get_pm, mock_get_srs, mock_save_srs, mock_handler_input, mock_persistence_manager
     ):
         """Test handling an invalid (non-numeric) answer."""
-        from lambda_function import AnswerIntentHandler
-
         mock_get_pm.return_value = mock_persistence_manager
 
         # Setup session state
@@ -443,7 +415,7 @@ class TestAnswerIntentHandler:
 
         # Setup slots with invalid answer
         mock_handler_input.request_envelope.request.intent.slots = {
-            "answer": MagicMock(value="banana")
+            "number": MagicMock(value="banana")
         }
 
         handler = AnswerIntentHandler()
@@ -463,14 +435,12 @@ class TestAnswerIntentHandler:
 class TestProgressHandler:
     """Tests for the ProgressHandler."""
 
-    @patch("lambda_function.get_srs_from_session")
-    @patch("lambda_function.get_persistence_manager")
+    @patch("alexa.handlers.progress.get_srs_from_session")
+    @patch("alexa.handlers.progress.get_persistence_manager")
     def test_handle_with_stats(
         self, mock_get_pm, mock_get_srs, mock_handler_input, mock_persistence_manager
     ):
         """Test progress report with existing stats."""
-        from lambda_function import ProgressHandler
-
         mock_get_pm.return_value = mock_persistence_manager
 
         srs = MagicMock()
@@ -491,12 +461,10 @@ class TestProgressHandler:
         # Should mention percentage (80%)
         assert "80" in speech
 
-    @patch("lambda_function.get_srs_from_session")
-    @patch("lambda_function.get_persistence_manager")
+    @patch("alexa.handlers.progress.get_srs_from_session")
+    @patch("alexa.handlers.progress.get_persistence_manager")
     def test_handle_no_data(self, mock_get_pm, mock_get_srs, mock_handler_input):
         """Test progress report with no data."""
-        from lambda_function import ProgressHandler
-
         pm = MagicMock()
         pm.get_session_stats.return_value = {
             "total_questions": 0,
@@ -527,14 +495,12 @@ class TestProgressHandler:
 class TestSetDifficultyHandler:
     """Tests for the SetDifficultyHandler."""
 
-    @patch("lambda_function.get_srs_from_session")
-    @patch("lambda_function.get_persistence_manager")
+    @patch("alexa.handlers.settings.get_srs_from_session")
+    @patch("alexa.handlers.settings.get_persistence_manager")
     def test_set_grade_explicitly(
         self, mock_get_pm, mock_get_srs, mock_handler_input, sample_question
     ):
         """Test setting grade explicitly."""
-        from lambda_function import SetDifficultyHandler
-
         pm = MagicMock()
         profile = UserProfile(user_id="test", grade=2)
         pm.get_user_profile.return_value = profile
@@ -557,12 +523,10 @@ class TestSetDifficultyHandler:
         assert profile.grade == 3
         pm.save_user_profile.assert_called()
 
-    @patch("lambda_function.get_srs_from_session")
-    @patch("lambda_function.get_persistence_manager")
+    @patch("alexa.handlers.settings.get_srs_from_session")
+    @patch("alexa.handlers.settings.get_persistence_manager")
     def test_make_easier(self, mock_get_pm, mock_get_srs, mock_handler_input, sample_question):
         """Test making difficulty easier."""
-        from lambda_function import SetDifficultyHandler
-
         pm = MagicMock()
         profile = UserProfile(user_id="test", grade=3)
         pm.get_user_profile.return_value = profile
@@ -584,12 +548,10 @@ class TestSetDifficultyHandler:
         # Grade should decrease by 1
         assert profile.grade == 2
 
-    @patch("lambda_function.get_srs_from_session")
-    @patch("lambda_function.get_persistence_manager")
+    @patch("alexa.handlers.settings.get_srs_from_session")
+    @patch("alexa.handlers.settings.get_persistence_manager")
     def test_make_harder(self, mock_get_pm, mock_get_srs, mock_handler_input, sample_question):
         """Test making difficulty harder."""
-        from lambda_function import SetDifficultyHandler
-
         pm = MagicMock()
         profile = UserProfile(user_id="test", grade=2)
         pm.get_user_profile.return_value = profile
@@ -622,8 +584,6 @@ class TestHelpIntentHandler:
 
     def test_help_during_quiz(self, mock_handler_input):
         """Test help message during quiz includes question."""
-        from lambda_function import HelpIntentHandler
-
         session_attr = mock_handler_input.attributes_manager.session_attributes
         session_attr["state"] = data.STATE_QUIZ
         session_attr["current_question"] = {
@@ -643,8 +603,6 @@ class TestHelpIntentHandler:
 
     def test_help_outside_quiz(self, mock_handler_input):
         """Test general help message outside quiz."""
-        from lambda_function import HelpIntentHandler
-
         session_attr = mock_handler_input.attributes_manager.session_attributes
         session_attr["state"] = data.STATE_NONE
 
@@ -668,8 +626,6 @@ class TestExitIntentHandler:
 
     def test_exit_during_quiz_shows_summary(self, mock_handler_input):
         """Test exit during quiz shows progress summary."""
-        from lambda_function import ExitIntentHandler
-
         session_attr = mock_handler_input.attributes_manager.session_attributes
         session_attr["state"] = data.STATE_QUIZ
         session_attr["correct_count"] = 3
@@ -689,8 +645,6 @@ class TestExitIntentHandler:
 
     def test_exit_outside_quiz(self, mock_handler_input):
         """Test normal exit message outside quiz."""
-        from lambda_function import ExitIntentHandler
-
         session_attr = mock_handler_input.attributes_manager.session_attributes
         session_attr["state"] = data.STATE_NONE
 
@@ -714,8 +668,6 @@ class TestRepeatHandler:
 
     def test_repeat_during_quiz(self, mock_handler_input):
         """Test repeat during quiz repeats the question."""
-        from lambda_function import RepeatHandler
-
         session_attr = mock_handler_input.attributes_manager.session_attributes
         session_attr["state"] = data.STATE_QUIZ
         session_attr["current_question"] = {
@@ -742,8 +694,6 @@ class TestFallbackIntentHandler:
 
     def test_fallback_during_quiz(self, mock_handler_input):
         """Test fallback during quiz repeats question."""
-        from lambda_function import FallbackIntentHandler
-
         session_attr = mock_handler_input.attributes_manager.session_attributes
         session_attr["state"] = data.STATE_QUIZ
         session_attr["current_question"] = {
@@ -761,8 +711,6 @@ class TestFallbackIntentHandler:
 
     def test_fallback_outside_quiz(self, mock_handler_input):
         """Test fallback outside quiz gives help."""
-        from lambda_function import FallbackIntentHandler
-
         session_attr = mock_handler_input.attributes_manager.session_attributes
         session_attr["state"] = data.STATE_NONE
 
