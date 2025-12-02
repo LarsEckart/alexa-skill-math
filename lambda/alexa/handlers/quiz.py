@@ -71,9 +71,11 @@ class AnswerIntentHandler(AbstractRequestHandler):
 
     def can_handle(self, handler_input):
         session_attr = handler_input.attributes_manager.session_attributes
-        return (
-            is_intent_name("AnswerIntent")(handler_input)
-            and session_attr.get("state") == data.STATE_QUIZ
+        if session_attr.get("state") != data.STATE_QUIZ:
+            return False
+        # Accept both AnswerIntent and SetGradeIntent (numbers 1-4 can be misrecognized)
+        return is_intent_name("AnswerIntent")(handler_input) or is_intent_name("SetGradeIntent")(
+            handler_input
         )
 
     def handle(self, handler_input):
@@ -87,9 +89,9 @@ class AnswerIntentHandler(AbstractRequestHandler):
 
         current_q = session_attr.get("current_question", {})
 
-        # Get the user's answer
+        # Get the user's answer (from AnswerIntent's "number" or SetGradeIntent's "grade" slot)
         slots = handler_input.request_envelope.request.intent.slots
-        answer_slot = slots.get("number", {})
+        answer_slot = slots.get("number") or slots.get("grade")
         user_answer = answer_slot.value if answer_slot else None
 
         # Validate answer

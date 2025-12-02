@@ -21,9 +21,11 @@ class SetDifficultyHandler(AbstractRequestHandler):
     """
 
     def can_handle(self, handler_input):
-        return is_intent_name("SetDifficultyIntent")(handler_input) or is_intent_name(
-            "SetGradeIntent"
-        )(handler_input)
+        session_attr = handler_input.attributes_manager.session_attributes
+        # Don't handle SetGradeIntent during quiz - it's likely an answer misrecognized
+        if is_intent_name("SetGradeIntent")(handler_input):
+            return session_attr.get("state") != data.STATE_QUIZ
+        return is_intent_name("SetDifficultyIntent")(handler_input)
 
     def handle(self, handler_input):
         logger.info("In SetDifficultyHandler")
