@@ -13,29 +13,30 @@ from datetime import datetime
 class QuestionStats:
     """
     Statistics tracked for each question for spaced repetition.
-    
+
     Uses a Leitner Box system (boxes 1-5):
     - Box 1: New/difficult questions (asked frequently)
     - Box 5: Well-learned questions (asked rarely)
     """
+
     question_id: str  # Matches MathQuestion.question_id, e.g., "add_7_5"
     correct_count: int = 0
     incorrect_count: int = 0
     last_asked: datetime | None = None
     box: int = 1  # Leitner box (1-5), starts at 1
-    
+
     @property
     def total_attempts(self) -> int:
         """Total number of times this question was asked."""
         return self.correct_count + self.incorrect_count
-    
+
     @property
     def accuracy(self) -> float:
         """Accuracy rate as a value between 0 and 1."""
         if self.total_attempts == 0:
             return 0.5  # Neutral for new questions
         return self.correct_count / self.total_attempts
-    
+
     def to_dict(self) -> dict:
         """Convert to dictionary for persistence."""
         return {
@@ -45,14 +46,14 @@ class QuestionStats:
             "last_asked": self.last_asked.isoformat() if self.last_asked else None,
             "box": self.box,
         }
-    
+
     @classmethod
-    def from_dict(cls, data: dict) -> "QuestionStats":
+    def from_dict(cls, data: dict) -> QuestionStats:
         """Create from dictionary (from persistence)."""
         last_asked = None
         if data.get("last_asked"):
             last_asked = datetime.fromisoformat(data["last_asked"])
-        
+
         return cls(
             question_id=data["question_id"],
             correct_count=data.get("correct_count", 0),
@@ -67,6 +68,7 @@ class UserProfile:
     """
     User profile containing learning preferences and overall statistics.
     """
+
     user_id: str
     name: str | None = None
     grade: int = 1  # Grade level (1-4)
@@ -76,14 +78,14 @@ class UserProfile:
     best_streak: int = 0
     last_session: datetime | None = None
     created_at: datetime = field(default_factory=datetime.now)
-    
+
     @property
     def overall_accuracy(self) -> float:
         """Overall accuracy across all questions."""
         if self.total_questions_answered == 0:
             return 0.0
         return self.total_correct / self.total_questions_answered
-    
+
     def to_dict(self) -> dict:
         """Convert to dictionary for persistence."""
         return {
@@ -97,18 +99,18 @@ class UserProfile:
             "last_session": self.last_session.isoformat() if self.last_session else None,
             "created_at": self.created_at.isoformat(),
         }
-    
+
     @classmethod
-    def from_dict(cls, data: dict) -> "UserProfile":
+    def from_dict(cls, data: dict) -> UserProfile:
         """Create from dictionary (from persistence)."""
         last_session = None
         if data.get("last_session"):
             last_session = datetime.fromisoformat(data["last_session"])
-        
+
         created_at = datetime.now()
         if data.get("created_at"):
             created_at = datetime.fromisoformat(data["created_at"])
-        
+
         return cls(
             user_id=data["user_id"],
             name=data.get("name"),

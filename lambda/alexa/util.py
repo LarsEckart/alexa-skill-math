@@ -1,4 +1,3 @@
-
 """Utility module to generate text for commonly used responses."""
 
 import random
@@ -122,7 +121,7 @@ def get_question_without_ordinal(attr, item):
 
 def get_question(counter, attr, item):
     """Return response text for nth question to the user."""
-    return (f"Here is your {get_ordinal_indicator(counter)} question. {get_question_without_ordinal(attr, item)}")
+    return f"Here is your {get_ordinal_indicator(counter)} question. {get_question_without_ordinal(attr, item)}"
 
 
 def get_answer(attr, item):

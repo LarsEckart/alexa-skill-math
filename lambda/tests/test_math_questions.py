@@ -225,7 +225,7 @@ class TestGenerateQuestionValidation:
         for _ in range(50):
             question = generate_question(grade=3)  # Has all 4 operations
             operations_seen.add(question.operation)
-        
+
         # Should see multiple different operations
         assert len(operations_seen) >= 2
 

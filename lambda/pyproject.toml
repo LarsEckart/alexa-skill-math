@@ -5,6 +5,7 @@ description = "Alexa quiz skill using ASK Python SDK"
 requires-python = ">=3.14"
 dependencies = [
     "ask-sdk-core>=1.19.0,<2.0",
+    "ask-sdk-dynamodb-persistence-adapter>=1.19.0,<2.0",
 ]
 
 [tool.hatch.build.targets.wheel]
@@ -20,6 +21,7 @@ dev = [
     "pytest>=9.0.1",
     "pytest-cov>=7.0.0",
     "ruff>=0.14.6",
+    "testcontainers>=4.13.3",
 ]
 
 [tool.ruff]

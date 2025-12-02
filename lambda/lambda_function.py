@@ -1,4 +1,3 @@
-
 # IMPORTANT: Please note that this template uses Display Directives,
 # Display Interface for your skill should be enabled through the Amazon
 # developer console
@@ -6,6 +5,7 @@
 
 import json
 import logging
+import os
 
 from ask_sdk_core.dispatch_components import (
     AbstractExceptionHandler,
@@ -15,8 +15,9 @@ from ask_sdk_core.dispatch_components import (
 )
 from ask_sdk_core.response_helper import get_plain_text_content, get_rich_text_content
 from ask_sdk_core.serialize import DefaultSerializer
-from ask_sdk_core.skill_builder import SkillBuilder
+from ask_sdk_core.skill_builder import CustomSkillBuilder
 from ask_sdk_core.utils import is_intent_name, is_request_type
+from ask_sdk_dynamodb_persistence_adapter import DynamoDbPersistenceAdapter
 from ask_sdk_model import Response, ui
 from ask_sdk_model.interfaces.display import (
     BackButtonBehavior,
@@ -31,8 +32,19 @@ from ask_sdk_model.interfaces.display import (
 
 from alexa import data, util
 
-# Skill Builder object
-sb = SkillBuilder()
+# DynamoDB table name for persistence (configurable via environment variable)
+DYNAMODB_TABLE_NAME = os.environ.get("DYNAMODB_TABLE_NAME", "MathQuizUserData")
+
+# Persistence adapter for storing user data in DynamoDB
+persistence_adapter = DynamoDbPersistenceAdapter(
+    table_name=DYNAMODB_TABLE_NAME,
+    partition_key_name="id",
+    attribute_name="attributes",
+    create_table=False,  # Table should be created via infrastructure (WP6)
+)
+
+# Skill Builder with persistence adapter
+sb = CustomSkillBuilder(persistence_adapter=persistence_adapter)
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)

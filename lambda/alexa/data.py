@@ -1,4 +1,3 @@
-
 STATES_LIST = [
     {
         "abbreviation": "MS",
