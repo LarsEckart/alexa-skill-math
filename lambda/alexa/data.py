@@ -1,457 +1,257 @@
-STATES_LIST = [
-    {
-        "abbreviation": "MS",
-        "capital": "Jackson",
-        "state": "Mississippi",
-        "statehood_order": "20",
-        "statehood_year": "1817",
-    },
-    {
-        "abbreviation": "OK",
-        "capital": "Oklahoma City",
-        "state": "Oklahoma",
-        "statehood_order": "46",
-        "statehood_year": "1907",
-    },
-    {
-        "abbreviation": "DE",
-        "capital": "Dover",
-        "state": "Delaware",
-        "statehood_order": "1",
-        "statehood_year": "1787",
-    },
-    {
-        "abbreviation": "MN",
-        "capital": "St. Paul",
-        "state": "Minnesota",
-        "statehood_order": "32",
-        "statehood_year": "1858",
-    },
-    {
-        "abbreviation": "NH",
-        "capital": "Concord",
-        "state": "Hampshire",
-        "statehood_order": "9",
-        "statehood_year": "1788",
-    },
-    {
-        "abbreviation": "IL",
-        "capital": "Springfield",
-        "state": "Illinois",
-        "statehood_order": "21",
-        "statehood_year": "1818",
-    },
-    {
-        "abbreviation": "AR",
-        "capital": "Little Rock",
-        "state": "Arkansas",
-        "statehood_order": "25",
-        "statehood_year": "1836",
-    },
-    {
-        "abbreviation": "IN",
-        "capital": "Indianapolis",
-        "state": "Indiana",
-        "statehood_order": "19",
-        "statehood_year": "1816",
-    },
-    {
-        "abbreviation": "MD",
-        "capital": "Annapolis",
-        "state": "Maryland",
-        "statehood_order": "7",
-        "statehood_year": "1788",
-    },
-    {
-        "abbreviation": "LA",
-        "capital": "Baton Rouge",
-        "state": "Louisiana",
-        "statehood_order": "18",
-        "statehood_year": "1812",
-    },
-    {
-        "abbreviation": "ID",
-        "capital": "Boise",
-        "state": "Idaho",
-        "statehood_order": "43",
-        "statehood_year": "1890",
-    },
-    {
-        "abbreviation": "WY",
-        "capital": "Cheyenne",
-        "state": "Wyoming",
-        "statehood_order": "44",
-        "statehood_year": "1890",
-    },
-    {
-        "abbreviation": "TN",
-        "capital": "Nashville",
-        "state": "Tennessee",
-        "statehood_order": "16",
-        "statehood_year": "1796",
-    },
-    {
-        "abbreviation": "AZ",
-        "capital": "Phoenix",
-        "state": "Arizona",
-        "statehood_order": "48",
-        "statehood_year": "1912",
-    },
-    {
-        "abbreviation": "IA",
-        "capital": "Des Moines",
-        "state": "Iowa",
-        "statehood_order": "29",
-        "statehood_year": "1846",
-    },
-    {
-        "abbreviation": "MI",
-        "capital": "Lansing",
-        "state": "Michigan",
-        "statehood_order": "26",
-        "statehood_year": "1837",
-    },
-    {
-        "abbreviation": "KS",
-        "capital": "Topeka",
-        "state": "Kansas",
-        "statehood_order": "34",
-        "statehood_year": "1861",
-    },
-    {
-        "abbreviation": "UT",
-        "capital": "Salt Lake City",
-        "state": "Utah",
-        "statehood_order": "45",
-        "statehood_year": "1896",
-    },
-    {
-        "abbreviation": "VA",
-        "capital": "Richmond",
-        "state": "Virginia",
-        "statehood_order": "10",
-        "statehood_year": "1788",
-    },
-    {
-        "abbreviation": "OR",
-        "capital": "Salem",
-        "state": "Oregon",
-        "statehood_order": "33",
-        "statehood_year": "1859",
-    },
-    {
-        "abbreviation": "CT",
-        "capital": "Hartford",
-        "state": "Connecticut",
-        "statehood_order": "5",
-        "statehood_year": "1788",
-    },
-    {
-        "abbreviation": "MT",
-        "capital": "Helena",
-        "state": "Montana",
-        "statehood_order": "41",
-        "statehood_year": "1889",
-    },
-    {
-        "abbreviation": "CA",
-        "capital": "Sacramento",
-        "state": "California",
-        "statehood_order": "31",
-        "statehood_year": "1850",
-    },
-    {
-        "abbreviation": "MA",
-        "capital": "Boston",
-        "state": "Massachusetts",
-        "statehood_order": "6",
-        "statehood_year": "1788",
-    },
-    {
-        "abbreviation": "WV",
-        "capital": "Charleston",
-        "state": "West Virginia",
-        "statehood_order": "35",
-        "statehood_year": "1863",
-    },
-    {
-        "abbreviation": "SC",
-        "capital": "Columbia",
-        "state": "South Carolina",
-        "statehood_order": "8",
-        "statehood_year": "1788",
-    },
-    {
-        "abbreviation": "WI",
-        "capital": "Madison",
-        "state": "Wisconsin",
-        "statehood_order": "30",
-        "statehood_year": "1848",
-    },
-    {
-        "abbreviation": "VT",
-        "capital": "Montpelier",
-        "state": "Vermont",
-        "statehood_order": "14",
-        "statehood_year": "1791",
-    },
-    {
-        "abbreviation": "GA",
-        "capital": "Atlanta",
-        "state": "Georgia",
-        "statehood_order": "4",
-        "statehood_year": "1788",
-    },
-    {
-        "abbreviation": "ND",
-        "capital": "Bismarck",
-        "state": "North Dakota",
-        "statehood_order": "39",
-        "statehood_year": "1889",
-    },
-    {
-        "abbreviation": "PA",
-        "capital": "Harrisburg",
-        "state": "Pennsylvania",
-        "statehood_order": "2",
-        "statehood_year": "1787",
-    },
-    {
-        "abbreviation": "FL",
-        "capital": "Tallahassee",
-        "state": "Florida",
-        "statehood_order": "27",
-        "statehood_year": "1845",
-    },
-    {
-        "abbreviation": "AK",
-        "capital": "Juneau",
-        "state": "Alaska",
-        "statehood_order": "49",
-        "statehood_year": "1959",
-    },
-    {
-        "abbreviation": "KY",
-        "capital": "Frankfort",
-        "state": "Kentucky",
-        "statehood_order": "15",
-        "statehood_year": "1792",
-    },
-    {
-        "abbreviation": "HI",
-        "capital": "Honolulu",
-        "state": "Hawaii",
-        "statehood_order": "50",
-        "statehood_year": "1959",
-    },
-    {
-        "abbreviation": "NE",
-        "capital": "Lincoln",
-        "state": "Nebraska",
-        "statehood_order": "37",
-        "statehood_year": "1867",
-    },
-    {
-        "abbreviation": "MO",
-        "capital": "Jefferson City",
-        "state": "Missouri",
-        "statehood_order": "24",
-        "statehood_year": "1821",
-    },
-    {
-        "abbreviation": "OH",
-        "capital": "Columbus",
-        "state": "Ohio",
-        "statehood_order": "17",
-        "statehood_year": "1803",
-    },
-    {
-        "abbreviation": "AL",
-        "capital": "Montgomery",
-        "state": "Alabama",
-        "statehood_order": "22",
-        "statehood_year": "1819",
-    },
-    {
-        "abbreviation": "RI",
-        "capital": "Providence",
-        "state": "Rhode Island",
-        "statehood_order": "13",
-        "statehood_year": "1790",
-    },
-    {
-        "abbreviation": "NJ",
-        "capital": "Trenton",
-        "state": "Jersey",
-        "statehood_order": "3",
-        "statehood_year": "1787",
-    },
-    {
-        "abbreviation": "SD",
-        "capital": "Pierre",
-        "state": "South Dakota",
-        "statehood_order": "40",
-        "statehood_year": "1889",
-    },
-    {
-        "abbreviation": "CO",
-        "capital": "Denver",
-        "state": "Colorado",
-        "statehood_order": "38",
-        "statehood_year": "1876",
-    },
-    {
-        "abbreviation": "NM",
-        "capital": "Santa Fe",
-        "state": "Mexico",
-        "statehood_order": "47",
-        "statehood_year": "1912",
-    },
-    {
-        "abbreviation": "WA",
-        "capital": "Olympia",
-        "state": "Washington",
-        "statehood_order": "42",
-        "statehood_year": "1889",
-    },
-    {
-        "abbreviation": "NC",
-        "capital": "Raleigh",
-        "state": "North Carolina",
-        "statehood_order": "12",
-        "statehood_year": "1789",
-    },
-    {
-        "abbreviation": "NY",
-        "capital": "Albany",
-        "state": "New York",
-        "statehood_order": "11",
-        "statehood_year": "1788",
-    },
-    {
-        "abbreviation": "TX",
-        "capital": "Austin",
-        "state": "Texas",
-        "statehood_order": "28",
-        "statehood_year": "1845",
-    },
-    {
-        "abbreviation": "NV",
-        "capital": "Carson City",
-        "state": "Nevada",
-        "statehood_order": "36",
-        "statehood_year": "1864",
-    },
-    {
-        "abbreviation": "ME",
-        "capital": "Augusta",
-        "state": "Maine",
-        "statehood_order": "23",
-        "statehood_year": "1820",
-    },
-]
+"""
+German language data and prompts for the Math Quiz Alexa Skill.
 
-SKILL_TITLE = "United States Quiz Game"
+This module contains all German text strings used by the skill,
+including welcome messages, feedback, help text, and speech patterns.
+"""
 
-WELCOME_MESSAGE = (
-    "Welcome to the United States Quiz Game!  "
-    "You can ask me about any of the "
-    "fifty states and their capitals, or you can ask me to "
-    "start a quiz.  What would you like to do? "
-)
+# Skill metadata
+SKILL_TITLE = "Mathe-Quiz für Grundschüler"
 
-START_QUIZ_MESSAGE = "OK.  I will ask you 10 questions about the United States. "
-
-EXIT_SKILL_MESSAGE = "Thank you for playing the United States Quiz Game!  Let's play again soon!"
-
-REPROMPT_SPEECH = "Which other state or capital would you like to know about?"
-
-HELP_MESSAGE = (
-    "I know lots of things about the United States.  "
-    "You can ask me about a state "
-    "or a capital, and I'll tell you what I know.  "
-    "You can also test your knowledge by asking me to start "
-    "a quiz.  What would you like to do? "
-)
-
-CORRECT_SPEECHCONS = [
-    "Booya",
-    "All righty",
-    "Bam",
-    "Bazinga",
-    "Bingo",
-    "Boom",
-    "Bravo",
-    "Cha Ching",
-    "Cheers",
-    "Dynomite",
-    "Hip hip hooray",
-    "Hurrah",
-    "Hurray",
-    "Huzzah",
-    "Oh dear.  Just kidding.  Hurray",
-    "Kaboom",
-    "Kaching",
-    "Oh snap",
-    "Phew",
-    "Righto",
-    "Way to go",
-    "Well done",
-    "Whee",
-    "Woo hoo",
-    "Yay",
-    "Wowza",
-    "Yowsa",
-]
-
-WRONG_SPEECHCONS = [
-    "Argh",
-    "Aw man",
-    "Blarg",
-    "Blast",
-    "Boo",
-    "Bummer",
-    "Darn",
-    "D'oh",
-    "Dun dun dun",
-    "Eek",
-    "Honk",
-    "Le sigh",
-    "Mamma mia",
-    "Oh boy",
-    "Oh dear",
-    "Oof",
-    "Ouch",
-    "Ruh roh",
-    "Shucks",
-    "Uh oh",
-    "Wah wah",
-    "Whoops a daisy",
-    "Yikes",
-]
-
-IMG_PATH = (
-    "https://m.media-amazon.com/images/G/01/mobile-apps/dex/alexa/"
-    "alexa-skills-kit/tutorials/quiz-game/state_flag/{}x{}/{}._TTH_.png"
-)
-
-USE_CARDS_FLAG = True
-
+# Maximum questions per quiz session
 MAX_QUESTIONS = 10
 
-BAD_ANSWER = "I'm sorry. {} is not something I know very much about in this skill."
+# ============================================================================
+# Welcome and Launch Messages
+# ============================================================================
 
-FALLBACK_ANSWER = f"Sorry. I can't help you with that. {HELP_MESSAGE}"
-
-SCORE = "Your {} score is {} out of {}. "
-
-SPEECH_DESC = (
-    "{} is the {}th state, "
-    "admitted to the Union in {}.  "
-    "The capital of {} is {}, and the "
-    "abbreviation for {} is "
-    "<break strength='strong'/><say-as interpret-as='spell-out'>"
-    "{}</say-as>.  I've added {} to "
-    "your Alexa app.  Which other state or capital would you like to "
-    "know about? "
+WELCOME_MESSAGE_FIRST_TIME = (
+    "Hallo! Willkommen beim Mathe-Quiz! "
+    "Ich bin dein Rechentrainer und helfe dir, besser in Mathe zu werden. "
+    "Wie heißt du denn?"
 )
+
+WELCOME_MESSAGE_RETURNING = (
+    "Willkommen zurück, {name}! "
+    "Beim letzten Mal hattest du {correct} von {total} richtig. "
+    "Möchtest du wieder üben?"
+)
+
+WELCOME_MESSAGE_RETURNING_NO_STATS = (
+    "Willkommen zurück, {name}! Schön, dass du wieder da bist. Möchtest du rechnen üben?"
+)
+
+WELCOME_MESSAGE_UNNAMED = "Willkommen zurück beim Mathe-Quiz! Möchtest du wieder rechnen üben?"
+
+# ============================================================================
+# Setup Flow Messages
+# ============================================================================
+
+ASK_NAME = "Wie heißt du denn?"
+
+ASK_GRADE = "Hallo {name}! Schön dich kennenzulernen. In welche Klasse gehst du? Erste bis vierte?"
+
+CONFIRM_GRADE = "Prima! Du bist also in der {grade}. Klasse. Lass uns anfangen!"
+
+INVALID_GRADE = "Ich trainiere Mathe für die erste bis vierte Klasse. In welche Klasse gehst du?"
+
+# ============================================================================
+# Quiz Messages
+# ============================================================================
+
+START_QUIZ_MESSAGE = "Lass uns rechnen! Hier kommt die erste Aufgabe: "
+
+NEXT_QUESTION = "Nächste Aufgabe: "
+
+QUESTION_NUMBER = "Aufgabe {number}: "
+
+# ============================================================================
+# Answer Feedback - Correct
+# ============================================================================
+
+# German speech interjections for correct answers
+CORRECT_SPEECHCONS = [
+    "Super",
+    "Prima",
+    "Toll",
+    "Klasse",
+    "Wunderbar",
+    "Ausgezeichnet",
+    "Fantastisch",
+    "Spitze",
+    "Sehr gut",
+    "Richtig",
+    "Genau",
+    "Bravo",
+    "Jawohl",
+]
+
+CORRECT_ANSWER_TEMPLATES = [
+    "Super! Das ist richtig!",
+    "Prima! {answer} ist die richtige Antwort!",
+    "Toll gemacht! {answer} stimmt!",
+    "Genau richtig!",
+    "Spitze! Das war richtig!",
+    "Sehr gut!",
+    "Klasse! {answer} ist korrekt!",
+]
+
+# ============================================================================
+# Answer Feedback - Incorrect
+# ============================================================================
+
+# German speech interjections for incorrect answers
+WRONG_SPEECHCONS = [
+    "Oh",
+    "Hmm",
+    "Schade",
+    "Ups",
+    "Oh nein",
+]
+
+WRONG_ANSWER_TEMPLATES = [
+    "Hmm, das war leider falsch. {operand1} {operation} {operand2} ist {answer}.",
+    "Schade, das stimmt nicht. Die richtige Antwort ist {answer}.",
+    "Das war leider nicht richtig. {operand1} {operation} {operand2} ergibt {answer}.",
+    "Nicht ganz. Die Antwort ist {answer}.",
+]
+
+# ============================================================================
+# Quiz End Messages
+# ============================================================================
+
+QUIZ_END_PERFECT = (
+    "Wow! Du hast alle {total} Aufgaben richtig! Das war perfekt! "
+    "Du bist ein echter Mathe-Champion!"
+)
+
+QUIZ_END_GREAT = (
+    "Super gemacht! Du hattest {correct} von {total} richtig. Das ist ein tolles Ergebnis!"
+)
+
+QUIZ_END_GOOD = "Gut gemacht! Du hattest {correct} von {total} richtig. Weiter so!"
+
+QUIZ_END_KEEP_PRACTICING = (
+    "Du hattest {correct} von {total} richtig. "
+    "Das wird bestimmt besser mit mehr Übung! "
+    "Möchtest du noch einmal spielen?"
+)
+
+# ============================================================================
+# Progress and Statistics
+# ============================================================================
+
+PROGRESS_REPORT = (
+    "Du hast insgesamt {total} Aufgaben beantwortet. "
+    "Davon waren {correct} richtig, das sind {percentage} Prozent. "
+)
+
+PROGRESS_STREAK = "Deine längste Serie richtiger Antworten war {streak}. "
+
+PROGRESS_STRONG_AREAS = "Du bist super bei {areas}! "
+
+PROGRESS_WEAK_AREAS = "{areas} musst du noch üben. "
+
+PROGRESS_NO_DATA = (
+    "Du hast noch keine Aufgaben beantwortet. Sag einfach 'Quiz starten' um loszulegen!"
+)
+
+# ============================================================================
+# Difficulty and Grade
+# ============================================================================
+
+DIFFICULTY_CHANGED = "Alles klar! Ich stelle die Aufgaben jetzt auf Klasse {grade} um."
+
+DIFFICULTY_EASIER = "Okay, ich mache die Aufgaben etwas leichter."
+
+DIFFICULTY_HARDER = "Gut, ich mache die Aufgaben etwas schwieriger."
+
+DIFFICULTY_SAME = "Du bist schon auf dem {direction} Level."
+
+# ============================================================================
+# Help Messages
+# ============================================================================
+
+HELP_MESSAGE = (
+    "Ich kann dir helfen, Mathe zu üben. "
+    "Sag 'Quiz starten' um zu rechnen, "
+    "'Wie gut bin ich' für deine Fortschritte, "
+    "oder 'Mach es leichter' oder 'schwerer' um die Schwierigkeit anzupassen. "
+    "Was möchtest du tun?"
+)
+
+HELP_DURING_QUIZ = (
+    "Sag mir einfach die Antwort als Zahl. "
+    "Wenn du die Aufgabe nochmal hören willst, sag 'Wiederhole'. "
+    "Zum Beenden sag 'Stopp'."
+)
+
+# ============================================================================
+# Repeat and Reprompt
+# ============================================================================
+
+REPEAT_QUESTION = "Noch einmal: {question}"
+
+REPROMPT_QUIZ = "Was ist die Antwort?"
+
+REPROMPT_GENERAL = "Möchtest du rechnen üben? Sag einfach 'Quiz starten'."
+
+# ============================================================================
+# Exit Messages
+# ============================================================================
+
+EXIT_SKILL_MESSAGE = "Tschüss! Bis zum nächsten Mal beim Mathe-Quiz!"
+
+EXIT_DURING_QUIZ = (
+    "Okay, wir hören auf. Du hattest {correct} von {answered} richtig. Bis zum nächsten Mal!"
+)
+
+EXIT_SAVE_PROGRESS = "Ich habe deinen Fortschritt gespeichert. Bis bald!"
+
+# ============================================================================
+# Error Messages
+# ============================================================================
+
+FALLBACK_MESSAGE = "Das habe ich leider nicht verstanden. Sag 'Hilfe' wenn du nicht weiter weißt."
+
+ERROR_MESSAGE = "Es tut mir leid, da ist etwas schiefgegangen. Bitte versuche es noch einmal."
+
+NOT_UNDERSTOOD_DURING_QUIZ = (
+    "Ich habe die Zahl nicht verstanden. Bitte sag mir nur die Antwort als Zahl."
+)
+
+# ============================================================================
+# Operation words for German speech
+# ============================================================================
+
+OPERATION_WORDS = {
+    "add": "plus",
+    "sub": "minus",
+    "mul": "mal",
+    "div": "geteilt durch",
+}
+
+# German names for operations (for progress reports)
+OPERATION_NAMES = {
+    "add": "Addition",
+    "sub": "Subtraktion",
+    "mul": "Multiplikation",
+    "div": "Division",
+}
+
+OPERATION_NAMES_FRIENDLY = {
+    "add": "Plus-Aufgaben",
+    "sub": "Minus-Aufgaben",
+    "mul": "Mal-Aufgaben",
+    "div": "Geteilt-Aufgaben",
+}
+
+# ============================================================================
+# Session States
+# ============================================================================
+
+STATE_NONE = "NONE"
+STATE_SETUP_NAME = "SETUP_NAME"
+STATE_SETUP_GRADE = "SETUP_GRADE"
+STATE_QUIZ = "QUIZ"
+
+# ============================================================================
+# Grade level names
+# ============================================================================
+
+GRADE_NAMES = {
+    1: "erste",
+    2: "zweite",
+    3: "dritte",
+    4: "vierte",
+}
