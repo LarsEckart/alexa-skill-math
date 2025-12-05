@@ -1,10 +1,23 @@
 """Helper functions for Alexa skill handlers."""
 
 import random
+from typing import TypedDict
 
 from alexa import data
+from alexa.math_questions import MathQuestion
 from alexa.persistence import get_persistence_manager
 from alexa.srs import SpacedRepetition
+
+
+class SerializedQuestion(TypedDict):
+    """Type definition for a serialized MathQuestion stored in session."""
+
+    question_id: str
+    operand1: int
+    operand2: int
+    operation: str
+    correct_answer: int
+    question_text_german: str
 
 
 def get_srs_from_session(handler_input) -> SpacedRepetition:
@@ -63,7 +76,7 @@ def get_quiz_end_message(correct: int, total: int) -> str:
         return data.QUIZ_END_KEEP_PRACTICING.format(correct=correct, total=total)
 
 
-def serialize_question(question) -> dict:
+def serialize_question(question: MathQuestion) -> SerializedQuestion:
     """Serialize a MathQuestion to a dictionary for session storage."""
     return {
         "question_id": question.question_id,
