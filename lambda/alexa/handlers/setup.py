@@ -7,7 +7,7 @@ from ask_sdk_core.dispatch_components import AbstractRequestHandler
 from ask_sdk_core.utils import is_intent_name
 
 from alexa import data
-from alexa.handlers.helpers import get_srs_from_session
+from alexa.handlers.helpers import get_srs_from_session, serialize_question
 from alexa.persistence import get_persistence_manager
 
 logger = logging.getLogger(__name__)
@@ -137,14 +137,7 @@ class SetupGradeHandler(AbstractRequestHandler):
         question = srs.get_next_question()
 
         session_attr["state"] = data.STATE_QUIZ
-        session_attr["current_question"] = {
-            "question_id": question.question_id,
-            "question_text_german": question.question_text_german,
-            "answer": question.answer,
-            "operand1": question.operand1,
-            "operand2": question.operand2,
-            "operation": question.operation.value,
-        }
+        session_attr["current_question"] = serialize_question(question)
         session_attr["correct_count"] = 0
         session_attr["questions_asked"] = 1
 
