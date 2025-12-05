@@ -33,18 +33,17 @@ flowchart TD
 
     subgraph PlayerSetup["Player Setup"]
         ASK_NAME --> |"SetNameIntent<br/>(user says name)"| SELECT[SelectPlayerHandler]
-        SELECT --> |"New player<br/>state = SETUP_GRADE"| ASK_GRADE{Waiting for grade}
-        SELECT --> |"Returning player<br/>Starts quiz immediately"| IN_QUIZ
+        SELECT --> |"state = SETUP_GRADE<br/>Asks: Welche Klasse?"| ASK_GRADE{Waiting for grade}
         ASK_GRADE --> |"SetGradeIntent<br/>(user says 1-4)"| GRADE[SetupGradeHandler]
-        GRADE --> |"state = NONE"| READY{Ready to play}
+        GRADE --> |"Starts quiz immediately"| IN_QUIZ
     end
 
     subgraph MainLoop["Quiz Loop"]
-        READY --> |"QuizIntent"| QUIZ[QuizHandler]
-        QUIZ --> |"state = QUIZ<br/>Asks question"| IN_QUIZ{In Quiz}
-        IN_QUIZ --> |"AnswerIntent<br/>(user says number)"| ANSWER[AnswerIntentHandler]
+        IN_QUIZ{In Quiz} --> |"AnswerIntent<br/>(user says number)"| ANSWER[AnswerIntentHandler]
         ANSWER --> |"More questions"| IN_QUIZ
-        ANSWER --> |"Quiz complete<br/>state = NONE"| READY
+        ANSWER --> |"Quiz complete<br/>state = NONE"| READY{Ready to play}
+        READY --> |"QuizIntent"| QUIZ[QuizHandler]
+        QUIZ --> |"state = QUIZ<br/>Asks question"| IN_QUIZ
         IN_QUIZ --> |"AMAZON.StartOverIntent"| QUIZ
     end
 
@@ -75,6 +74,7 @@ flowchart TD
 
     style LAUNCH fill:#90EE90
     style SELECT fill:#90EE90
+    style GRADE fill:#90EE90
     style QUIZ fill:#87CEEB
     style ANSWER fill:#87CEEB
     style EXIT fill:#FFB6C1
@@ -88,17 +88,17 @@ flowchart TD
 | State | Description |
 |-------|-------------|
 | `ASK_PLAYER` | Waiting for user to say their name |
-| `SETUP_GRADE` | Waiting for new player to say their grade (1-4) |
+| `SETUP_GRADE` | Waiting for user to say their grade (1-4) |
 | `QUIZ` | Quiz is active, waiting for answers |
-| `NONE` | Idle state, ready to start a new quiz |
+| `NONE` | Quiz complete, ready to start a new quiz |
 
 ### Key Intent Handlers
 
 | Handler | Trigger | Purpose |
 |---------|---------|---------|
 | `LaunchRequestHandler` | User opens skill | Welcome and ask for name |
-| `SelectPlayerHandler` | `SetNameIntent` in ASK_PLAYER state | Identify player; new players go to grade setup, returning players start quiz immediately |
-| `SetupGradeHandler` | `SetGradeIntent` in SETUP_GRADE state | Set grade for new players |
+| `SelectPlayerHandler` | `SetNameIntent` in ASK_PLAYER state | Identify player, then ask for grade level |
+| `SetupGradeHandler` | `SetGradeIntent` in SETUP_GRADE state | Set grade and start quiz immediately |
 | `QuizHandler` | `QuizIntent` or `AMAZON.StartOverIntent` | Start a new quiz session |
 | `AnswerIntentHandler` | `AnswerIntent` in QUIZ state | Process answer, track progress |
 | `IntentReflectorHandler` | Any unhandled intent | Catch-all, prevents errors |

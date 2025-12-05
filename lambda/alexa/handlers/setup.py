@@ -18,7 +18,7 @@ class SelectPlayerHandler(AbstractRequestHandler):
     Handler for selecting which player is playing.
 
     Triggered when user provides their name at the start of a session.
-    Routes to grade setup for new players, or welcome for returning players.
+    Always asks for grade level so user can choose difficulty each session.
     """
 
     def can_handle(self, handler_input):
@@ -51,51 +51,27 @@ class SelectPlayerHandler(AbstractRequestHandler):
         session_attr["current_player"] = name_value.lower().strip()
         session_attr["current_player_display"] = name_value
 
+        # Always ask for grade - allows choosing difficulty each session
+        session_attr["state"] = data.STATE_SETUP_GRADE
+
         if pm.is_new_player():
-            # New player - ask for grade
-            session_attr["state"] = data.STATE_SETUP_GRADE
             speech = data.WELCOME_MESSAGE_NEW_PLAYER.format(name=name_value)
-            reprompt = data.ASK_GRADE.format(name=name_value)
-            handler_input.response_builder.speak(speech).ask(reprompt)
-            return handler_input.response_builder.response
-
-        # Returning player - welcome back and start quiz immediately
-        session_stats = pm.get_session_stats()
-        pm.increment_session_count()
-        pm.commit()
-
-        total = session_stats.get("total_questions", 0)
-        correct = session_stats.get("total_correct", 0)
-
-        if total > 0:
-            welcome = data.WELCOME_MESSAGE_RETURNING.format(
-                name=name_value,
-                correct=correct,
-                total=total,
-            )
         else:
-            welcome = data.WELCOME_MESSAGE_RETURNING_NO_STATS.format(name=name_value)
+            # Returning player - welcome back and ask for grade
+            session_stats = pm.get_session_stats()
+            total = session_stats.get("total_questions", 0)
+            correct = session_stats.get("total_correct", 0)
 
-        # Start quiz immediately
-        srs = get_srs_from_session(handler_input)
-        srs.reset_session()
-        question = srs.get_next_question()
+            if total > 0:
+                speech = data.WELCOME_MESSAGE_RETURNING.format(
+                    name=name_value,
+                    correct=correct,
+                    total=total,
+                )
+            else:
+                speech = data.WELCOME_MESSAGE_RETURNING_NO_STATS.format(name=name_value)
 
-        session_attr["state"] = data.STATE_QUIZ
-        session_attr["current_question"] = {
-            "question_id": question.question_id,
-            "question_text_german": question.question_text_german,
-            "answer": question.answer,
-            "operand1": question.operand1,
-            "operand2": question.operand2,
-            "operation": question.operation.value,
-        }
-        session_attr["correct_count"] = 0
-        session_attr["questions_asked"] = 1
-
-        speech = welcome + " " + question.question_text_german
-        reprompt = question.question_text_german
-
+        reprompt = data.ASK_GRADE.format(name=name_value)
         handler_input.response_builder.speak(speech).ask(reprompt)
         return handler_input.response_builder.response
 
@@ -138,30 +114,46 @@ class SetupGradeHandler(AbstractRequestHandler):
 
         session_attr = handler_input.attributes_manager.session_attributes
 
-        try:
-            if grade and 1 <= grade <= 4:
-                # Save grade to profile
-                pm = get_persistence_manager(handler_input)
-                profile = pm.get_user_profile()
-                profile.grade = grade
-                pm.save_user_profile(profile)
-                pm.increment_session_count()
-                pm.commit()
-
-                grade_name = data.GRADE_NAMES.get(grade, str(grade))
-                session_attr["state"] = data.STATE_NONE
-
-                speech = data.CONFIRM_GRADE.format(grade=grade_name)
-                speech += " " + data.REPROMPT_GENERAL
-                reprompt = data.REPROMPT_GENERAL
-            else:
-                player_name = session_attr.get("current_player_display", "")
-                speech = data.INVALID_GRADE
-                reprompt = data.ASK_GRADE.format(name=player_name)
-        except (ValueError, TypeError):
+        if not (grade and 1 <= grade <= 4):
             player_name = session_attr.get("current_player_display", "")
             speech = data.INVALID_GRADE
             reprompt = data.ASK_GRADE.format(name=player_name)
+            handler_input.response_builder.speak(speech).ask(reprompt)
+            return handler_input.response_builder.response
+
+        # Save grade to profile
+        pm = get_persistence_manager(handler_input)
+        profile = pm.get_user_profile()
+        profile.grade = grade
+        pm.save_user_profile(profile)
+        pm.increment_session_count()
+        pm.commit()
+
+        grade_name = data.GRADE_NAMES.get(grade, str(grade))
+
+        # Start quiz immediately
+        srs = get_srs_from_session(handler_input)
+        srs.reset_session()
+        question = srs.get_next_question()
+
+        session_attr["state"] = data.STATE_QUIZ
+        session_attr["current_question"] = {
+            "question_id": question.question_id,
+            "question_text_german": question.question_text_german,
+            "answer": question.answer,
+            "operand1": question.operand1,
+            "operand2": question.operand2,
+            "operation": question.operation.value,
+        }
+        session_attr["correct_count"] = 0
+        session_attr["questions_asked"] = 1
+
+        speech = (
+            data.CONFIRM_GRADE.format(grade=grade_name)
+            + " Los geht's! "
+            + question.question_text_german
+        )
+        reprompt = question.question_text_german
 
         handler_input.response_builder.speak(speech).ask(reprompt)
         return handler_input.response_builder.response
