@@ -153,3 +153,35 @@ class FallbackIntentHandler(AbstractRequestHandler):
 
         handler_input.response_builder.speak(speech).ask(reprompt)
         return handler_input.response_builder.response
+
+
+class IntentReflectorHandler(AbstractRequestHandler):
+    """
+    Catch-all handler for any IntentRequest not handled by other handlers.
+
+    This prevents "Unable to find a suitable request handler" errors.
+    Logs the unhandled intent for debugging and provides a graceful response.
+    Must be registered last among intent handlers.
+    """
+
+    def can_handle(self, handler_input):
+        return is_request_type("IntentRequest")(handler_input)
+
+    def handle(self, handler_input):
+        intent_name = handler_input.request_envelope.request.intent.name
+        logger.warning(f"IntentReflectorHandler caught unhandled intent: {intent_name}")
+        logger.info(f"Request envelope: {handler_input.request_envelope}")
+
+        session_attr = handler_input.attributes_manager.session_attributes
+
+        if session_attr.get("state") == data.STATE_QUIZ:
+            current_q = session_attr.get("current_question", {})
+            question_text = current_q.get("question_text_german", "")
+            speech = data.FALLBACK_MESSAGE + " " + question_text
+            reprompt = question_text if question_text else data.REPROMPT_QUIZ
+        else:
+            speech = data.FALLBACK_MESSAGE
+            reprompt = data.REPROMPT_GENERAL
+
+        handler_input.response_builder.speak(speech).ask(reprompt)
+        return handler_input.response_builder.response

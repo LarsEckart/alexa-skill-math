@@ -9,6 +9,7 @@ from alexa.handlers.standard import (
     ExitIntentHandler,
     FallbackIntentHandler,
     HelpIntentHandler,
+    IntentReflectorHandler,
     RepeatHandler,
     SessionEndedRequestHandler,
 )
@@ -26,4 +27,5 @@ __all__ = [
     "ExitIntentHandler",
     "SessionEndedRequestHandler",
     "FallbackIntentHandler",
+    "IntentReflectorHandler",
 ]

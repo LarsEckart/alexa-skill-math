@@ -16,6 +16,7 @@ from alexa.handlers import (
     ExitIntentHandler,
     FallbackIntentHandler,
     HelpIntentHandler,
+    IntentReflectorHandler,
     LaunchRequestHandler,
     ProgressHandler,
     QuizHandler,
@@ -63,6 +64,7 @@ sb.add_request_handler(HelpIntentHandler())
 sb.add_request_handler(ExitIntentHandler())
 sb.add_request_handler(SessionEndedRequestHandler())
 sb.add_request_handler(FallbackIntentHandler())
+sb.add_request_handler(IntentReflectorHandler())  # Must be last - catches any unhandled intents
 
 # Add exception handler
 sb.add_exception_handler(CatchAllExceptionHandler())
