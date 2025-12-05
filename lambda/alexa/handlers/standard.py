@@ -84,6 +84,46 @@ class HelpIntentHandler(AbstractRequestHandler):
         return handler_input.response_builder.response
 
 
+class YesIntentHandler(AbstractRequestHandler):
+    """
+    Handler for Yes intent.
+
+    When user says "yes" or "ja", start the quiz.
+    This handles the "Möchtest du wieder üben?" prompt.
+    """
+
+    def can_handle(self, handler_input):
+        return is_intent_name("AMAZON.YesIntent")(handler_input)
+
+    def handle(self, handler_input):
+        logger.info("In YesIntentHandler")
+
+        # Import here to avoid circular dependency
+        from alexa.handlers.quiz import QuizHandler
+
+        # Delegate to QuizHandler to start the quiz
+        quiz_handler = QuizHandler()
+        return quiz_handler.handle(handler_input)
+
+
+class NoIntentHandler(AbstractRequestHandler):
+    """
+    Handler for No intent.
+
+    When user says "no" or "nein", exit gracefully.
+    """
+
+    def can_handle(self, handler_input):
+        return is_intent_name("AMAZON.NoIntent")(handler_input)
+
+    def handle(self, handler_input):
+        logger.info("In NoIntentHandler")
+
+        speech = data.EXIT_SKILL_MESSAGE
+        handler_input.response_builder.speak(speech).set_should_end_session(True)
+        return handler_input.response_builder.response
+
+
 class ExitIntentHandler(AbstractRequestHandler):
     """
     Handler for Cancel, Stop, and Pause intents.
