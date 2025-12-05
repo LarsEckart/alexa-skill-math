@@ -35,7 +35,7 @@ GRADE_CONFIGS: dict[int, DifficultyConfig] = {
     1: DifficultyConfig(
         grade=1,
         operations=[Operation.ADDITION, Operation.SUBTRACTION],
-        number_range=(0, 20),
+        number_range=(1, 10),
     ),
     2: DifficultyConfig(
         grade=2,
@@ -110,11 +110,14 @@ def generate_question_id(operation: Operation, operand1: int, operand2: int) -> 
 
 def _generate_addition(config: DifficultyConfig) -> MathQuestion:
     """Generate an addition question within the configured range."""
+    min_num = config.number_range[0]
     max_num = config.number_range[1]
 
-    # Generate operands such that their sum doesn't exceed max
-    operand1 = random.randint(0, max_num)
-    operand2 = random.randint(0, max_num - operand1)
+    # Generate operands within range, ensuring sum doesn't exceed max
+    operand1 = random.randint(min_num, max_num)
+    # Ensure operand2 is at least min_num but sum doesn't exceed max
+    max_operand2 = max(min_num, max_num - operand1)
+    operand2 = random.randint(min_num, max_operand2)
 
     answer = operand1 + operand2
     operation = Operation.ADDITION
@@ -137,11 +140,12 @@ def _generate_addition(config: DifficultyConfig) -> MathQuestion:
 
 def _generate_subtraction(config: DifficultyConfig) -> MathQuestion:
     """Generate a subtraction question ensuring no negative results."""
+    min_num = config.number_range[0]
     max_num = config.number_range[1]
 
-    # Generate operands such that result is non-negative
-    operand1 = random.randint(0, max_num)
-    operand2 = random.randint(0, operand1)  # operand2 <= operand1
+    # Generate operands such that result is non-negative and both are in range
+    operand1 = random.randint(min_num, max_num)
+    operand2 = random.randint(min_num, operand1)  # operand2 <= operand1
 
     answer = operand1 - operand2
     operation = Operation.SUBTRACTION

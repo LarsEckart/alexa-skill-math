@@ -385,9 +385,9 @@ class TestGradeFiltering:
         # Get questions multiple times - should never get the hard ones
         for _ in range(20):
             question = srs.get_next_question()
-            # All operands should be <= 20 for grade 1
-            assert question.operand1 <= 20, f"Got operand1={question.operand1} for grade 1"
-            assert question.operand2 <= 20, f"Got operand2={question.operand2} for grade 1"
+            # All operands should be 1-10 for grade 1
+            assert 1 <= question.operand1 <= 10, f"Got operand1={question.operand1} for grade 1"
+            assert 1 <= question.operand2 <= 10, f"Got operand2={question.operand2} for grade 1"
 
     def test_filters_out_operations_not_available_for_grade(self):
         """Operations not available for grade should be filtered."""

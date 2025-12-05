@@ -90,7 +90,7 @@ class TestGradeConfigs:
         assert Operation.SUBTRACTION in config.operations
         assert Operation.MULTIPLICATION not in config.operations
         assert Operation.DIVISION not in config.operations
-        assert config.number_range == (0, 20)
+        assert config.number_range == (1, 10)
 
     def test_grade_2_config(self):
         """Test grade 2 configuration."""
@@ -117,12 +117,12 @@ class TestGenerateQuestionAddition:
     """Tests for addition question generation."""
 
     def test_addition_grade_1_in_range(self):
-        """Test that grade 1 addition stays within 0-20."""
+        """Test that grade 1 addition stays within 1-10."""
         for _ in range(100):  # Run multiple times for randomness
             question = generate_question(grade=1, operation=Operation.ADDITION)
-            assert 0 <= question.operand1 <= 20
-            assert 0 <= question.operand2 <= 20
-            assert 0 <= question.correct_answer <= 20
+            assert 1 <= question.operand1 <= 10
+            assert 1 <= question.operand2 <= 10
+            assert question.correct_answer <= 20  # Sum can be up to 20
             assert question.operation == Operation.ADDITION
 
     def test_addition_answer_correct(self):
