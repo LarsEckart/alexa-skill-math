@@ -365,3 +365,44 @@ class TestSRSIntegration:
 
         # Should have more than just add/sub
         assert len(operations) >= 2
+
+
+class TestGradeFiltering:
+    """Tests for grade-appropriate question filtering."""
+
+    def test_filters_out_questions_too_hard_for_grade(self):
+        """Questions from higher grades should be filtered when playing at lower grade."""
+        # Create stats with questions from grade 4 (large numbers)
+        stats = {
+            "sub_456_123": QuestionStats(question_id="sub_456_123", box=1),  # Too hard for grade 1
+            "add_500_300": QuestionStats(question_id="add_500_300", box=1),  # Too hard for grade 1
+            "add_5_3": QuestionStats(question_id="add_5_3", box=1),  # OK for grade 1
+        }
+
+        # Create SRS at grade 1 (number range 0-20)
+        srs = SpacedRepetition(question_stats=stats, grade=1)
+
+        # Get questions multiple times - should never get the hard ones
+        for _ in range(20):
+            question = srs.get_next_question()
+            # All operands should be <= 20 for grade 1
+            assert question.operand1 <= 20, f"Got operand1={question.operand1} for grade 1"
+            assert question.operand2 <= 20, f"Got operand2={question.operand2} for grade 1"
+
+    def test_filters_out_operations_not_available_for_grade(self):
+        """Operations not available for grade should be filtered."""
+        # Create stats with multiplication (not available in grade 1)
+        stats = {
+            "mul_3_4": QuestionStats(question_id="mul_3_4", box=1),  # Multiplication not in grade 1
+            "add_5_3": QuestionStats(question_id="add_5_3", box=1),  # OK for grade 1
+        }
+
+        # Create SRS at grade 1 (only addition and subtraction)
+        srs = SpacedRepetition(question_stats=stats, grade=1)
+
+        # Get questions multiple times - should never get multiplication
+        for _ in range(20):
+            question = srs.get_next_question()
+            assert question.operation in [Operation.ADDITION, Operation.SUBTRACTION], (
+                f"Got {question.operation} for grade 1"
+            )

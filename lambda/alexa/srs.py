@@ -20,7 +20,12 @@ import random
 from collections import defaultdict
 from datetime import datetime
 
-from alexa.math_questions import MathQuestion, Operation, generate_question
+from alexa.math_questions import (
+    GRADE_CONFIGS,
+    MathQuestion,
+    Operation,
+    generate_question,
+)
 from alexa.models import QuestionStats
 
 # Leitner box configuration
@@ -121,6 +126,44 @@ class SpacedRepetition:
         # Use new question ratio with some randomness
         return random.random() < NEW_QUESTION_RATIO
 
+    def _is_question_appropriate_for_grade(self, question_id: str) -> bool:
+        """
+        Check if a question ID is appropriate for the current grade level.
+
+        Questions from higher grades (with larger numbers) should not be
+        shown when playing at a lower grade.
+        """
+        try:
+            parts = question_id.split("_")
+            if len(parts) != 3:
+                return False
+
+            op_str, op1_str, op2_str = parts
+            operand1 = int(op1_str)
+            operand2 = int(op2_str)
+
+            config = GRADE_CONFIGS.get(self._grade)
+            if not config:
+                return False
+
+            max_num = config.number_range[1]
+
+            # Check if operands are within grade's number range
+            if operand1 > max_num or operand2 > max_num:
+                return False
+
+            # Check if operation is available for this grade
+            op_map = {
+                "add": Operation.ADDITION,
+                "sub": Operation.SUBTRACTION,
+                "mul": Operation.MULTIPLICATION,
+                "div": Operation.DIVISION,
+            }
+            operation = op_map.get(op_str)
+            return operation in config.operations
+        except (ValueError, IndexError):
+            return False
+
     def _select_from_srs(self) -> MathQuestion | None:
         """
         Select a question from existing stats using weighted box selection.
@@ -128,9 +171,11 @@ class SpacedRepetition:
         Returns:
             A MathQuestion or None if no suitable question found.
         """
-        # Filter out recently asked questions
+        # Filter out recently asked questions AND questions inappropriate for current grade
         available_stats = [
-            stats for q_id, stats in self._stats.items() if q_id not in self._recent_questions
+            stats
+            for q_id, stats in self._stats.items()
+            if q_id not in self._recent_questions and self._is_question_appropriate_for_grade(q_id)
         ]
 
         if not available_stats:
