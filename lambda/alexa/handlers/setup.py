@@ -7,6 +7,7 @@ from ask_sdk_core.dispatch_components import AbstractRequestHandler
 from ask_sdk_core.utils import is_intent_name
 
 from alexa import data
+from alexa.handlers.helpers import get_srs_from_session
 from alexa.persistence import get_persistence_manager
 
 logger = logging.getLogger(__name__)
@@ -55,26 +56,45 @@ class SelectPlayerHandler(AbstractRequestHandler):
             session_attr["state"] = data.STATE_SETUP_GRADE
             speech = data.WELCOME_MESSAGE_NEW_PLAYER.format(name=name_value)
             reprompt = data.ASK_GRADE.format(name=name_value)
+            handler_input.response_builder.speak(speech).ask(reprompt)
+            return handler_input.response_builder.response
+
+        # Returning player - welcome back and start quiz immediately
+        session_stats = pm.get_session_stats()
+        pm.increment_session_count()
+        pm.commit()
+
+        total = session_stats.get("total_questions", 0)
+        correct = session_stats.get("total_correct", 0)
+
+        if total > 0:
+            welcome = data.WELCOME_MESSAGE_RETURNING.format(
+                name=name_value,
+                correct=correct,
+                total=total,
+            )
         else:
-            # Returning player - welcome back
-            session_stats = pm.get_session_stats()
-            pm.increment_session_count()
-            pm.commit()
+            welcome = data.WELCOME_MESSAGE_RETURNING_NO_STATS.format(name=name_value)
 
-            total = session_stats.get("total_questions", 0)
-            correct = session_stats.get("total_correct", 0)
+        # Start quiz immediately
+        srs = get_srs_from_session(handler_input)
+        srs.reset_session()
+        question = srs.get_next_question()
 
-            if total > 0:
-                speech = data.WELCOME_MESSAGE_RETURNING.format(
-                    name=name_value,
-                    correct=correct,
-                    total=total,
-                )
-            else:
-                speech = data.WELCOME_MESSAGE_RETURNING_NO_STATS.format(name=name_value)
+        session_attr["state"] = data.STATE_QUIZ
+        session_attr["current_question"] = {
+            "question_id": question.question_id,
+            "question_text_german": question.question_text_german,
+            "answer": question.answer,
+            "operand1": question.operand1,
+            "operand2": question.operand2,
+            "operation": question.operation.value,
+        }
+        session_attr["correct_count"] = 0
+        session_attr["questions_asked"] = 1
 
-            reprompt = data.REPROMPT_GENERAL
-            session_attr["state"] = data.STATE_NONE
+        speech = welcome + " " + question.question_text_german
+        reprompt = question.question_text_german
 
         handler_input.response_builder.speak(speech).ask(reprompt)
         return handler_input.response_builder.response

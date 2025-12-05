@@ -20,12 +20,10 @@ WELCOME_MESSAGE = "Hallo! Willkommen beim Mathe-Quiz! Wer spielt heute?"
 WELCOME_MESSAGE_RETURNING = (
     "Hallo {name}! Schön, dass du wieder da bist. "
     "Beim letzten Mal hattest du {correct} von {total} richtig. "
-    "Möchtest du wieder üben?"
+    "Los geht's!"
 )
 
-WELCOME_MESSAGE_RETURNING_NO_STATS = (
-    "Hallo {name}! Schön, dass du wieder da bist. Möchtest du rechnen üben?"
-)
+WELCOME_MESSAGE_RETURNING_NO_STATS = "Hallo {name}! Schön, dass du wieder da bist. Los geht's!"
 
 WELCOME_MESSAGE_NEW_PLAYER = (
     "Hallo {name}! Schön dich kennenzulernen. In welche Klasse gehst du? Erste bis vierte?"

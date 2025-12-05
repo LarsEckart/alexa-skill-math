@@ -28,14 +28,6 @@
           "samples": []
         },
         {
-          "name": "AMAZON.YesIntent",
-          "samples": []
-        },
-        {
-          "name": "AMAZON.NoIntent",
-          "samples": []
-        },
-        {
           "name": "QuizIntent",
           "samples": [
             "starte ein quiz",

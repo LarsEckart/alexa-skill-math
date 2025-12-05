@@ -18,7 +18,6 @@ from alexa.handlers import (
     HelpIntentHandler,
     IntentReflectorHandler,
     LaunchRequestHandler,
-    NoIntentHandler,
     ProgressHandler,
     QuizHandler,
     RepeatHandler,
@@ -26,7 +25,6 @@ from alexa.handlers import (
     SessionEndedRequestHandler,
     SetDifficultyHandler,
     SetupGradeHandler,
-    YesIntentHandler,
 )
 from alexa.interceptors import (
     CacheResponseForRepeatInterceptor,
@@ -63,8 +61,6 @@ sb.add_request_handler(SetDifficultyHandler())
 sb.add_request_handler(ProgressHandler())
 sb.add_request_handler(RepeatHandler())
 sb.add_request_handler(HelpIntentHandler())
-sb.add_request_handler(YesIntentHandler())
-sb.add_request_handler(NoIntentHandler())
 sb.add_request_handler(ExitIntentHandler())
 sb.add_request_handler(SessionEndedRequestHandler())
 sb.add_request_handler(FallbackIntentHandler())
