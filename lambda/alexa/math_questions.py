@@ -34,7 +34,7 @@ class DifficultyConfig:
 GRADE_CONFIGS: dict[int, DifficultyConfig] = {
     1: DifficultyConfig(
         grade=1,
-        operations=[Operation.ADDITION, Operation.SUBTRACTION],
+        operations=[Operation.ADDITION],
         number_range=(1, 10),
     ),
     2: DifficultyConfig(

@@ -86,8 +86,8 @@ class TestGradeConfigs:
         """Test grade 1 configuration."""
         config = GRADE_CONFIGS[1]
         assert config.grade == 1
-        assert Operation.ADDITION in config.operations
-        assert Operation.SUBTRACTION in config.operations
+        assert config.operations == [Operation.ADDITION]
+        assert Operation.SUBTRACTION not in config.operations
         assert Operation.MULTIPLICATION not in config.operations
         assert Operation.DIVISION not in config.operations
         assert config.number_range == (1, 10)
@@ -145,19 +145,19 @@ class TestGenerateQuestionSubtraction:
     def test_subtraction_no_negative_results(self):
         """Test that subtraction never produces negative results."""
         for _ in range(100):
-            question = generate_question(grade=1, operation=Operation.SUBTRACTION)
+            question = generate_question(grade=2, operation=Operation.SUBTRACTION)
             assert question.correct_answer >= 0
             assert question.operand1 >= question.operand2
 
     def test_subtraction_answer_correct(self):
         """Test that subtraction answer is computed correctly."""
         for _ in range(50):
-            question = generate_question(grade=1, operation=Operation.SUBTRACTION)
+            question = generate_question(grade=2, operation=Operation.SUBTRACTION)
             assert question.correct_answer == question.operand1 - question.operand2
 
     def test_subtraction_question_text_german(self):
         """Test German question text for subtraction."""
-        question = generate_question(grade=1, operation=Operation.SUBTRACTION)
+        question = generate_question(grade=2, operation=Operation.SUBTRACTION)
         assert "minus" in question.question_text_german
 
 
@@ -256,7 +256,7 @@ class TestHelperFunctions:
     def test_get_available_operations(self):
         """Test getting available operations for grade."""
         ops = get_available_operations(1)
-        assert ops == [Operation.ADDITION, Operation.SUBTRACTION]
+        assert ops == [Operation.ADDITION]
 
     def test_get_available_operations_invalid_grade(self):
         """Test error for invalid grade."""
