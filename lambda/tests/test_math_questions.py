@@ -96,9 +96,11 @@ class TestGradeConfigs:
         """Test grade 2 configuration."""
         config = GRADE_CONFIGS[2]
         assert config.grade == 2
-        assert Operation.MULTIPLICATION in config.operations
-        assert config.multiplication_tables == [2, 5, 10]
-        assert config.number_range == (0, 100)
+        assert Operation.ADDITION in config.operations
+        assert Operation.SUBTRACTION in config.operations
+        assert Operation.MULTIPLICATION not in config.operations
+        assert config.operation_ranges[Operation.ADDITION] == (1, 20)
+        assert config.operation_ranges[Operation.SUBTRACTION] == (1, 10)
 
     def test_grade_3_config(self):
         """Test grade 3 configuration."""
@@ -125,6 +127,14 @@ class TestGenerateQuestionAddition:
             assert question.correct_answer <= 20  # Sum can be up to 20
             assert question.operation == Operation.ADDITION
 
+    def test_addition_grade_2_uses_operation_range(self):
+        """Test that grade 2 addition uses the operation-specific range (1-20)."""
+        for _ in range(100):
+            question = generate_question(grade=2, operation=Operation.ADDITION)
+            assert 1 <= question.operand1 <= 20
+            assert 1 <= question.operand2 <= 20
+            assert question.correct_answer <= 40  # Sum can be up to 40
+
     def test_addition_answer_correct(self):
         """Test that addition answer is computed correctly."""
         for _ in range(50):
@@ -149,6 +159,13 @@ class TestGenerateQuestionSubtraction:
             assert question.correct_answer >= 0
             assert question.operand1 >= question.operand2
 
+    def test_subtraction_grade_2_uses_operation_range(self):
+        """Test that grade 2 subtraction uses the operation-specific range (1-10)."""
+        for _ in range(100):
+            question = generate_question(grade=2, operation=Operation.SUBTRACTION)
+            assert 1 <= question.operand1 <= 10
+            assert 1 <= question.operand2 <= 10
+
     def test_subtraction_answer_correct(self):
         """Test that subtraction answer is computed correctly."""
         for _ in range(50):
@@ -167,9 +184,9 @@ class TestGenerateQuestionMultiplication:
     def test_multiplication_uses_times_tables(self):
         """Test that multiplication uses configured times tables."""
         for _ in range(50):
-            question = generate_question(grade=2, operation=Operation.MULTIPLICATION)
-            # At least one operand should be from [2, 5, 10]
-            tables = [2, 5, 10]
+            question = generate_question(grade=3, operation=Operation.MULTIPLICATION)
+            # At least one operand should be from the times tables (1-10 for grade 3)
+            tables = list(range(1, 11))
             assert question.operand1 in tables or question.operand2 in tables
 
     def test_multiplication_answer_correct(self):
@@ -180,7 +197,7 @@ class TestGenerateQuestionMultiplication:
 
     def test_multiplication_question_text_german(self):
         """Test German question text for multiplication."""
-        question = generate_question(grade=2, operation=Operation.MULTIPLICATION)
+        question = generate_question(grade=3, operation=Operation.MULTIPLICATION)
         assert "mal" in question.question_text_german
 
 

@@ -26,8 +26,9 @@ class DifficultyConfig:
 
     grade: int
     operations: list[Operation]
-    number_range: tuple[int, int]  # (min, max)
+    number_range: tuple[int, int]  # (min, max) - default range
     multiplication_tables: list[int] | None = None  # For grades that learn specific tables
+    operation_ranges: dict[Operation, tuple[int, int]] | None = None  # Per-operation overrides
 
 
 # Difficulty configurations per grade level
@@ -39,9 +40,12 @@ GRADE_CONFIGS: dict[int, DifficultyConfig] = {
     ),
     2: DifficultyConfig(
         grade=2,
-        operations=[Operation.ADDITION, Operation.SUBTRACTION, Operation.MULTIPLICATION],
-        number_range=(0, 100),
-        multiplication_tables=[2, 5, 10],  # Intro to multiplication
+        operations=[Operation.ADDITION, Operation.SUBTRACTION],
+        number_range=(1, 20),  # Default range
+        operation_ranges={
+            Operation.ADDITION: (1, 20),
+            Operation.SUBTRACTION: (1, 10),
+        },
     ),
     3: DifficultyConfig(
         grade=3,
@@ -108,10 +112,16 @@ def generate_question_id(operation: Operation, operand1: int, operand2: int) -> 
     return f"{operation.value}_{operand1}_{operand2}"
 
 
+def _get_range(config: DifficultyConfig, operation: Operation) -> tuple[int, int]:
+    """Get the number range for an operation, using override if available."""
+    if config.operation_ranges and operation in config.operation_ranges:
+        return config.operation_ranges[operation]
+    return config.number_range
+
+
 def _generate_addition(config: DifficultyConfig) -> MathQuestion:
     """Generate an addition question within the configured range."""
-    min_num = config.number_range[0]
-    max_num = config.number_range[1]
+    min_num, max_num = _get_range(config, Operation.ADDITION)
 
     # Generate operands within range, ensuring sum doesn't exceed max
     operand1 = random.randint(min_num, max_num)
@@ -140,8 +150,7 @@ def _generate_addition(config: DifficultyConfig) -> MathQuestion:
 
 def _generate_subtraction(config: DifficultyConfig) -> MathQuestion:
     """Generate a subtraction question ensuring no negative results."""
-    min_num = config.number_range[0]
-    max_num = config.number_range[1]
+    min_num, max_num = _get_range(config, Operation.SUBTRACTION)
 
     # Generate operands such that result is non-negative and both are in range
     operand1 = random.randint(min_num, max_num)
